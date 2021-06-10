@@ -1,4 +1,4 @@
 # Bibliotaph
-Voice Reader for PDF and Web articles.
+Voice Reader app for PDF and Web articles.
 
-Appname: MyApp
+Appname: Bibliotaph
