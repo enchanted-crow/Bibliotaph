@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView filePath;
     private ArrayList<String> fileNames = new ArrayList<String>();
     private DbHandler dbHandler;
+    private ArrayAdapter<String> arrayAdapter;
 
     private void callChooseFileFromDevice() {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
@@ -63,8 +64,9 @@ public class MainActivity extends AppCompatActivity {
             fileNames.add(article.getFileName());
         }
 
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, fileNames);
+        arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, fileNames);
         listView.setAdapter(arrayAdapter);
+
 
     }
 
@@ -81,6 +83,8 @@ public class MainActivity extends AppCompatActivity {
                             String pdfName = extractPdfName(uri);
                             Article article = new Article(uri.toString(), pdfName);
                             dbHandler.addArticle(article);
+                            fileNames.add(pdfName);
+                            arrayAdapter.notifyDataSetChanged();
                         }
                     }
                 }
