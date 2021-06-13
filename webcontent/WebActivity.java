@@ -11,30 +11,40 @@ import android.webkit.WebViewClient;
 import android.widget.Button;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.IOException;
 
 
 public class WebActivity extends AppCompatActivity {
 
-    public static final String MSG = "com.example.webcontent.TITLE";
+    public static final String MSG = "com.example.webcontent.BODY";
     private WebView webView;
 
-    public static class DownloadTask extends AsyncTask<String, Void, String> {
+    public class DownloadTask extends AsyncTask<String, Void, Void> {
         @Override
-        protected String doInBackground(String... urls) {
-            String articleName = "Failed";
+        protected Void doInBackground(String... urls) {
+            String articleBody = "";
             try {
                 Document document = Jsoup.connect(urls[0]).get();
-                articleName = document.title();
 
-                Log.i("title", articleName);
+                Element body = document.getElementById("mw-content-text");
+                Elements paragraphs = body.getElementsByTag("p");
+                for(Element paragraph: paragraphs) {
+                    articleBody += paragraph.text() + "\n";
+                }
+
+                Intent intent = new Intent(WebActivity.this, MainActivity.class);
+                intent.putExtra(MSG, articleBody);
+                startActivity(intent);
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (NullPointerException e) {
                 e.printStackTrace();
             }
-            return articleName;
+
+            return null;
         }
 
     }
@@ -48,16 +58,14 @@ public class WebActivity extends AppCompatActivity {
         button.setOnClickListener(v -> {
             String url = webView.getUrl();
             Log.i("url", url);
-            String articleName = "";
             DownloadTask downloadTask = new DownloadTask();
             try {
-                articleName = downloadTask.execute(url).get();
+
+                downloadTask.execute(url);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            Intent intent = new Intent(WebActivity.this, MainActivity.class);
-            intent.putExtra(MSG, articleName);
-            startActivity(intent);
+
         });
 
         webView = findViewById(R.id.webView);
