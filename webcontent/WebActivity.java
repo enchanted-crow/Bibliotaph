@@ -3,7 +3,6 @@ package com.example.webcontent;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.webkit.WebView;
@@ -21,14 +20,12 @@ public class WebActivity extends AppCompatActivity {
 
     public static final String MSG = "com.example.webcontent.BODY";
     private WebView webView;
-
-    public class DownloadTask extends AsyncTask<String, Void, Void> {
-        @Override
-        protected Void doInBackground(String... urls) {
-            String articleBody = "";
+    
+    private void extractTextArticle(String url) {
+        new Thread(() -> {
             try {
-                Document document = Jsoup.connect(urls[0]).get();
-
+                String articleBody = "";
+                Document document = Jsoup.connect(url).get();
                 Element body = document.getElementById("mw-content-text");
                 Elements paragraphs = body.getElementsByTag("p");
                 for(Element paragraph: paragraphs) {
@@ -40,13 +37,9 @@ public class WebActivity extends AppCompatActivity {
                 startActivity(intent);
             } catch (IOException e) {
                 e.printStackTrace();
-            } catch (NullPointerException e) {
-                e.printStackTrace();
             }
 
-            return null;
-        }
-
+        }).start();
     }
 
     @Override
@@ -58,14 +51,7 @@ public class WebActivity extends AppCompatActivity {
         button.setOnClickListener(v -> {
             String url = webView.getUrl();
             Log.i("url", url);
-            DownloadTask downloadTask = new DownloadTask();
-            try {
-
-                downloadTask.execute(url);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
+            extractTextArticle(url);
         });
 
         webView = findViewById(R.id.webView);
