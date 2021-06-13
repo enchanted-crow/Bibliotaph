@@ -29,12 +29,15 @@ public class WebActivity extends AppCompatActivity {
                 articleName = document.title();
 
                 Log.i("title", articleName);
+
+                Intent intent = new Intent(WebActivity.this, MainActivity.class);
+                intent.putExtra(MSG, articleName);
+                startActivity(intent);
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (NullPointerException e) {
                 e.printStackTrace();
             }
-            return articleName;
         }
 
     }
@@ -51,13 +54,10 @@ public class WebActivity extends AppCompatActivity {
             String articleName = "";
             DownloadTask downloadTask = new DownloadTask();
             try {
-                articleName = downloadTask.execute(url).get();
+                downloadTask.execute(url);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            Intent intent = new Intent(WebActivity.this, MainActivity.class);
-            intent.putExtra(MSG, articleName);
-            startActivity(intent);
         });
 
         webView = findViewById(R.id.webView);
