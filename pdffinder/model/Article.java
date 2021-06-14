@@ -1,22 +1,14 @@
 package com.example.pdffinder.model;
 
 public class Article {
-    private String source;
     private String fileName;
+    private String textBody;
+
 
     public Article() {}
-
-    public Article(String source, String fileName) {
-        this.source = source;
+    public Article(String fileName, String textBody) {
         this.fileName = fileName;
-    }
-
-    public String getSource() {
-        return source;
-    }
-
-    public void setSource(String source) {
-        this.source = source;
+        this.textBody = textBody;
     }
 
     public String getFileName() {
@@ -25,5 +17,13 @@ public class Article {
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
+    }
+
+    public String getTextBody() {
+        return textBody;
+    }
+
+    public void setTextBody(String textBody) {
+        this.textBody = textBody;
     }
 }
