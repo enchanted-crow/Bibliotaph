@@ -1,0 +1,40 @@
+package com.example.bibliotaph.adapters
+
+import android.content.Context
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.example.bibliotaph.R
+import com.example.bibliotaph.models.CardModel
+
+data class MyAdapter(
+	private var list: ArrayList <CardModel>?,
+	private var context: Context?
+		) : RecyclerView.Adapter <MyAdapter.MyViewHolder> () {
+
+	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
+		val view : View = LayoutInflater.from(context).inflate(R.layout.recyclerview, parent, false)
+		return MyViewHolder(view)
+	}
+
+	override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
+		val cardModel : CardModel = list!![position]
+		holder.articleName.text = cardModel.fileName
+		holder.dateAdded.text = cardModel.dateAdded
+	}
+
+	override fun getItemCount(): Int {
+		return list!!.size
+	}
+
+	class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+		var articleName : TextView = itemView.findViewById(R.id.article_name)
+		var dateAdded : TextView = itemView.findViewById(R.id.date_added)
+	}
+
+//	interface OnCardListener {
+//		fun onCardListener (position: Int)
+//	}
+}
