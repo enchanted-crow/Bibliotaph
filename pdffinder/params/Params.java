@@ -6,8 +6,8 @@ public class Params {
     public static final String TABLE_NAME = "articleinfo";
 
 
-    public static final String KEY_SOURCE = "source";
     public static final String KEY_NAME = "filename";
+    public static final String KEY_BODY = "textbody";
     public static final String KEY_DATE = "added";
 
 }
