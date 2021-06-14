@@ -24,8 +24,8 @@ public class DbHandler extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         String create = "Create table if not exists " + Params.TABLE_NAME + "(" +
-                Params.KEY_SOURCE + " Varchar, " + Params.KEY_NAME +
-                " Varchar, " + Params.KEY_DATE + " Datetime)";
+                Params.KEY_NAME + " Varchar, " + Params.KEY_BODY +
+                " Text, " + Params.KEY_DATE + " Datetime)";
         db.execSQL(create);
         Log.i("info", "Database created");
     }
@@ -39,8 +39,8 @@ public class DbHandler extends SQLiteOpenHelper {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(Params.KEY_SOURCE, article.getSource());
         values.put(Params.KEY_NAME, article.getFileName());
+        values.put(Params.KEY_BODY, article.getTextBody());
         values.put(Params.KEY_DATE, dateFormat.format(new Date()));
         db.insert(Params.TABLE_NAME, null, values);
         Log.i("info", "Successfully inserted");
@@ -56,8 +56,8 @@ public class DbHandler extends SQLiteOpenHelper {
         if(cursor.moveToFirst()) {
             do {
                 Article article = new Article();
-                article.setSource(cursor.getString(0));
-                article.setFileName(cursor.getString(1));
+                article.setFileName(cursor.getString(0));
+                article.setTextBody(cursor.getString(1));
                 articleList.add(article);
             } while (cursor.moveToNext());
         }
