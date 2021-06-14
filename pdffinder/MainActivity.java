@@ -24,17 +24,21 @@ import com.itextpdf.text.pdf.parser.PdfTextExtractor;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 
 public class MainActivity extends AppCompatActivity {
 
     private InputStream inputStream;
-    private ArrayList<String> fileNames = new ArrayList<String>();
+    private ArrayList<String> fileNames = new ArrayList<>();
     private DbHandler dbHandler;
     private ArrayAdapter<String> arrayAdapter;
     private Article article;
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
 
     private void callChooseFileFromDevice() {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
@@ -98,7 +102,6 @@ public class MainActivity extends AppCompatActivity {
 
         articleAdder.setOnClickListener(v -> callChooseArticleFromWeb());
 
-
         dbHandler = new DbHandler(MainActivity.this);
         List<Article> articleList = dbHandler.getAllArticles();
         for(Article article: articleList) {
@@ -124,6 +127,8 @@ public class MainActivity extends AppCompatActivity {
                             article = new Article();
                             article.setFileName(pdfName);
                             extractTextPdfFile(uri);
+                            String dateAdded = dateFormat.format(new Date());
+                            article.setDateAdded(dateAdded);
                             dbHandler.addArticle(article);
                             fileNames.add(pdfName);
                             arrayAdapter.notifyDataSetChanged();
@@ -141,9 +146,11 @@ public class MainActivity extends AppCompatActivity {
                     if(result.getResultCode() == Activity.RESULT_OK) {
                         Intent data = result.getData();
                         if(data != null) {
+
                             String articleName = data.getStringExtra(WebActivity.TITLE);
                             String articleBody = data.getStringExtra(WebActivity.BODY);
-                            article = new Article(articleName, articleBody);
+                            String dateAdded = dateFormat.format(new Date());
+                            article = new Article(articleName, articleBody, dateAdded);
                             dbHandler.addArticle(article);
                             fileNames.add(articleName);
                             arrayAdapter.notifyDataSetChanged();
