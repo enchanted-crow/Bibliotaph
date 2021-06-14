@@ -10,9 +10,7 @@ import android.util.Log;
 import com.example.pdffinder.model.Article;
 import com.example.pdffinder.params.Params;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class DbHandler extends SQLiteOpenHelper {
@@ -24,10 +22,10 @@ public class DbHandler extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         String create = "Create table if not exists " + Params.TABLE_NAME + "(" +
-                Params.KEY_NAME + " Varchar, " + Params.KEY_BODY +
+                Params.KEY_NAME + " Varchar Primary key, " + Params.KEY_BODY +
                 " Text, " + Params.KEY_DATE + " Datetime)";
         db.execSQL(create);
-        Log.i("info", "Database created");
+        Log.i("database", "Database created");
     }
 
     @Override
@@ -36,14 +34,13 @@ public class DbHandler extends SQLiteOpenHelper {
     }
 
     public void addArticle(Article article) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(Params.KEY_NAME, article.getFileName());
         values.put(Params.KEY_BODY, article.getTextBody());
-        values.put(Params.KEY_DATE, dateFormat.format(new Date()));
+        values.put(Params.KEY_DATE, article.getDateAdded());
         db.insert(Params.TABLE_NAME, null, values);
-        Log.i("info", "Successfully inserted");
+        Log.i("database", "Successfully inserted");
     }
 
     public List<Article> getAllArticles() {
@@ -61,7 +58,9 @@ public class DbHandler extends SQLiteOpenHelper {
                 articleList.add(article);
             } while (cursor.moveToNext());
         }
+        cursor.close();
         return articleList;
     }
+
 
 }
