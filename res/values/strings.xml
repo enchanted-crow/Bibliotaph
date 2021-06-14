@@ -1,0 +1,56 @@
+<resources>
+    <string name="app_name">MyApp</string>
+    <string name="main_txtview_txt">Hello WOWOWWOWOWO </string>
+    <string name="button">Press Me</string>
+    <string name="sed_birthday">sed birthday</string>
+    <string name="hi">Android Kotlin Fundamentals
+
+The Android Kotlin Fundamentals course was created by the Google Developers Training team. In the course, you learn Android Kotlin programming concepts and build a variety of apps.
+
+The Android Kotlin Fundamentals course materials include:
+
+Course codelabs
+Starter apps and solution code in GitHub for apps that you create in the codelabs
+Prerequisites
+This course assumes that you know (or can quickly learn) the Kotlin programming language. To take the Android Kotlin Fundamentals course, we recommend that you have at least two years of experience in a full-fledged object-oriented programming language such as Java, C++, or Smalltalk.
+
+You should be familiar with all the concepts, tools, and vocabulary taught in Udacitys free Kotlin Bootcamp for Programmers course.
+
+You should also be comfortable navigating GitHub and familiar with the following concepts:
+
+Basic multithreading and exception handling.
+How code is built, compiled, and executed, in general terms.
+It also helps to have an idea of what functional programming is, but its not required.
+
+What does the course cover?
+We recommend that you take the Android Kotlin Fundamentals codelabs in sequence, but its not a requirement.
+
+Lesson 1: Build your first app
+Lesson 1 teaches you how to set up Android Studio to use Kotlin and how to build apps. You start with "Hello World" and move up to an app that uses image files and a click handler. You learn how Android projects are structured, how to use and modify views in your Kotlin Android app, and how to make sure your apps are backward-compatible. You also learn about API levels and the Android Jetpack libraries.
+
+Start Lesson 1
+
+Lesson 2: Layouts
+In Lesson 2, you learn how to use the Android Studio Layout Editor to create linear layouts and constraint layouts. You create apps that get and display user input, respond to user taps, and change the visibility and color of views. This lesson also teaches you how to use data binding to eliminate inefficient calls to the findViewById() method.
+
+Start Lesson 2
+
+Lesson 3: Navigation
+In Lesson 3, you learn how to create useful navigation in an app. You create a fragment and add it to an app, then add navigation to the app using the Android Studio navigation graph. You add a navigation drawer and an options menu to your app, and you work with the apps back stack, changing the destination of the system Back button. Finally, you learn how to invoke an external activity from within the app.
+
+Start Lesson 3
+
+Lesson 4: Activity and fragment lifecycles
+In Lesson 4, you learn about the activity and fragment lifecycles, and you learn how to manage complex lifecycle situations. You work with a starter app that contains several bugs related to the Android lifecycle. You add logging to the app to better understand the apps lifecycle events, and you fix the bugs that the app contains and add some enhancements to the app. You also learn about Android Jetpacks lifecycle library, which can help you manage lifecycle events with code thats better organized and easier to maintain.
+
+Start Lesson 4</string>
+    <string name="add_button">pdf/webview add button</string>
+    <string name="title_activity_reading_screen">ReadingScreenActivity</string>
+    <!--
+    This string is used for square devices and overridden by hello_world in
+    values-round/strings.xml for round devices.
+    -->
+    <string name="hello_world">Hello Square World!</string>
+    <string name="pdf_add_button">pdf add button</string>
+    <string name="add_article_button">webview add button</string>
+</resources>
