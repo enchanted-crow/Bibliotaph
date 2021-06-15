@@ -16,6 +16,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.bibliotaph.adapters.MyAdapter
 import com.example.bibliotaph.models.Article
 import com.example.bibliotaph.models.CardModel
+import com.example.bibliotaph.params.AppGlobals.cardList
+import com.example.bibliotaph.params.AppGlobals.myDB
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.itextpdf.text.pdf.PdfReader
 import com.itextpdf.text.pdf.parser.PdfTextExtractor
@@ -27,10 +29,11 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
+//    <Jawad>
 
+//    view-related variables
     private lateinit var recyclerView: RecyclerView
-
     private lateinit var addButton : FloatingActionButton
     private lateinit var addPDFButton : FloatingActionButton
     private lateinit var addArticleButton : FloatingActionButton
@@ -52,70 +55,83 @@ class MainActivity : AppCompatActivity() {
         R.anim.to_bottom_anim
     )}
 
+//    state variables
     private var addButtonExpanded : Boolean = false
-    private lateinit var myAdapter : MyAdapter
-    private val arrayList = ArrayList<CardModel>(1000)
 
-    // Tahmids variables
+//    private var cardList = ArrayList<CardModel>(1000)
+    private lateinit var myAdapter : MyAdapter
+    private var linearLayoutManager : LinearLayoutManager? = null
+//    </Jawad>
+
+
+
+//    <Tahmid>
     private var inputStream: InputStream? = null
-    private val fileNames = java.util.ArrayList<String>()
-    private var dbHandler: DbHandler? = null
-    private var article: Article? = null
+//    private var myDB: DbHandler? = null
+    private var article2add: Article? = null
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+//    </Tahmid>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-//        for(i in 1..10) {
-//            val card = CardModel ("Article Name", "Date Added")
-//            list.add(card)
-//        }
+        initAddButton()
 
-        dbHandler = DbHandler(this);
-        var articleList = dbHandler!!.allArticles;
-        for(article in articleList) {
-            val card = CardModel(article.fileName, article.dateAdded)
-            arrayList.add(card);
-        }
+        myDB = DbHandler(this);
+        cardList = createCardListFromDB(myDB!!)
 
-        recyclerView = findViewById(R.id.recycler_view)
-        myAdapter = MyAdapter(arrayList, this)
-        recyclerView.adapter = myAdapter
-
-        val linearLayoutManager = LinearLayoutManager(this)
-        recyclerView.layoutManager = linearLayoutManager
-
-        addButtonInit()
+        linearLayoutManager = LinearLayoutManager(this)
+        setupRecyclerView(linearLayoutManager!!)
     }
 
-    private fun addButtonInit() {
+    override fun onCardClick(position: Int) {
+        val intent = Intent(this, ReadingScreenActivity::class.java)
+        intent.putExtra("cardArrListIndex", position)
+        startActivity(intent)
+    }
+
+    private fun createCardListFromDB(myDB: DbHandler) : ArrayList <CardModel> {
+        val articleList = myDB.allArticles;
+        val cardList = ArrayList <CardModel> (1000)
+        for (article in articleList) {
+            val card = CardModel(article.fileName, article.dateAdded)
+            cardList.add(card);
+        }
+        return cardList
+    }
+
+    private fun setupRecyclerView(layoutManager: RecyclerView.LayoutManager) {
+        recyclerView = findViewById(R.id.recycler_view)
+
+        myAdapter = MyAdapter(cardList, this)
+        recyclerView.adapter = myAdapter
+
+        recyclerView.layoutManager = layoutManager
+    }
+
+    private fun initAddButton() {
         addButton = findViewById(R.id.add_pdf_nd_article_button)
         addButton.setOnClickListener {
-            onAddButtonClicked(addButtonExpanded)
+            onClickAddButton(addButtonExpanded)
         }
 
         addPDFButton = findViewById(R.id.add_pdf_button)
         addPDFButton.setOnClickListener {
-            val toast = Toast.makeText(this, "PDF!", Toast.LENGTH_SHORT)
-            toast.show()
-
+            Toast.makeText(this, "PDF!", Toast.LENGTH_SHORT).show()
             callChooseFileFromDevice()
         }
 
         addArticleButton = findViewById(R.id.add_article_button)
         addArticleButton.setOnClickListener {
-            val toast = Toast.makeText(this, "Article!", Toast.LENGTH_SHORT)
-            toast.show()
-
+            Toast.makeText(this, "Article!", Toast.LENGTH_SHORT).show()
             callChooseArticleFromWeb()
         }
     }
 
-    private fun onAddButtonClicked(function: Boolean) {
+    private fun onClickAddButton(function: Boolean) {
         setVisibility(addButtonExpanded)
         setAnimation(addButtonExpanded)
-//        setClickable(addButtonExpanded)
         addButtonExpanded = !addButtonExpanded
     }
 
@@ -143,24 +159,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setClickable(addButtonExpanded: Boolean) {
-        if(!addButtonExpanded) {
-            addArticleButton.isClickable = false
-            addPDFButton.isClickable = false
-        }
-        else {
-            addArticleButton.isClickable = true
-            addPDFButton.isClickable = true
-        }
-    }
 
-
-//    override fun onCardListener(position: Int) {
-//        var intent = Intent (this, ReadingScreenActivity :: class.java )
-//        startActivity(intent)
-//    }
-
-    // tahmi'd methods
+    // tahmid's methods
 
     private fun callChooseFileFromDevice() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
@@ -183,38 +183,6 @@ class MainActivity : AppCompatActivity() {
         return pdfName.substring(0, pdfName.lastIndexOf("."))
     }
 
-//    private fun extractTextPdfFile(uri: Uri) {
-//        try {
-//            inputStream = this@MainActivity.contentResolver.openInputStream(uri)
-//        } catch (e: FileNotFoundException) {
-//            e.printStackTrace()
-//        }
-//        Thread {
-//            val fileContent = StringBuilder()
-//            val reader: PdfReader
-//            try {
-//                reader = PdfReader(inputStream)
-//                val pages = reader.numberOfPages
-//                for (i in 1..pages) {
-//                    fileContent.append(PdfTextExtractor.getTextFromPage(reader, i).trim { it <= ' ' }).append("\n")
-//                }
-//                reader.close()
-//                article!!.textBody = fileContent.toString()
-//
-//                val dateAdded = dateFormat.format(Date())
-//
-//                article!!.dateAdded = dateAdded
-//                dbHandler!!.addArticle(article)
-//
-//                val card2add = CardModel(article!!.fileName, article!!.dateAdded)
-//                arrayList.add(card2add)
-//                myAdapter.notifyDataSetChanged()
-//            } catch (e: IOException) {
-//                e.printStackTrace()
-//            }
-//        }.start()
-//    }
-
     private fun extractTextPdfFile(uri: Uri) {
         try {
             inputStream = this@MainActivity.contentResolver.openInputStream(uri)
@@ -231,7 +199,7 @@ class MainActivity : AppCompatActivity() {
                     .append("\n")
             }
             reader.close()
-            article!!.textBody = fileContent.toString()
+            article2add!!.textBody = fileContent.toString()
         } catch (e: IOException) {
             e.printStackTrace()
         }
@@ -247,18 +215,18 @@ class MainActivity : AppCompatActivity() {
 
                 val pdfName = extractPdfName(uri!!)
 
-                article = Article()
+                article2add = Article()
 
                 extractTextPdfFile(uri)
 
-                article!!.fileName = pdfName
+                article2add!!.fileName = pdfName
                 val dateAdded = dateFormat.format(Date())
 
-                article!!.dateAdded = dateAdded
-                dbHandler!!.addArticle(article)
+                article2add!!.dateAdded = dateAdded
+                myDB!!.addArticle(article2add)
 
-                val card2add = CardModel(article!!.fileName, article!!.dateAdded)
-                arrayList.add(card2add)
+                val card2add = CardModel(article2add!!.fileName, article2add!!.dateAdded)
+                cardList.add(card2add)
                 myAdapter.notifyDataSetChanged()
             }
         }
@@ -273,11 +241,11 @@ class MainActivity : AppCompatActivity() {
                 val articleName = data.getStringExtra(WebActivity.TITLE)
                 val articleBody = data.getStringExtra(WebActivity.BODY)
                 val dateAdded = dateFormat.format(Date())
-                article = Article(articleName, articleBody, dateAdded)
-                dbHandler!!.addArticle(article)
+                article2add = Article(articleName, articleBody, dateAdded)
+                myDB!!.addArticle(article2add)
 
-                val card2add = CardModel(article!!.fileName, article!!.dateAdded)
-                arrayList.add(card2add)
+                val card2add = CardModel(article2add!!.fileName, article2add!!.dateAdded)
+                cardList.add(card2add)
                 myAdapter.notifyDataSetChanged()
             }
         }
