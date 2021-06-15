@@ -7,20 +7,20 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 import com.example.bibliotaph.models.Article;
-import com.example.bibliotaph.params.Params;
+import com.example.bibliotaph.params.AppGlobals;
 import java.util.ArrayList;
 
 public class DbHandler extends SQLiteOpenHelper {
 
     public DbHandler(Context context) {
-        super(context, Params.DB_NAME, null, Params.DB_VERSION);
+        super(context, AppGlobals.DB_NAME, null, AppGlobals.DB_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String create = "Create table if not exists " + Params.TABLE_NAME + "(" +
-                Params.KEY_NAME + " Varchar Primary key, " + Params.KEY_BODY +
-                " Text, " + Params.KEY_DATE + " Datetime)";
+        String create = "Create table if not exists " + AppGlobals.TABLE_NAME + "(" +
+                AppGlobals.KEY_NAME + " Varchar Primary key, " + AppGlobals.KEY_BODY +
+                " Text, " + AppGlobals.KEY_DATE + " Datetime)";
         db.execSQL(create);
         Log.i("database", "Database created");
     }
@@ -33,10 +33,10 @@ public class DbHandler extends SQLiteOpenHelper {
     public void addArticle(Article article) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(Params.KEY_NAME, article.getFileName());
-        values.put(Params.KEY_BODY, article.getTextBody());
-        values.put(Params.KEY_DATE, article.getDateAdded());
-        db.insert(Params.TABLE_NAME, null, values);
+        values.put(AppGlobals.KEY_NAME, article.getFileName());
+        values.put(AppGlobals.KEY_BODY, article.getTextBody());
+        values.put(AppGlobals.KEY_DATE, article.getDateAdded());
+        db.insert(AppGlobals.TABLE_NAME, null, values);
         Log.i("database", article.getTextBody());
     }
 
@@ -44,7 +44,7 @@ public class DbHandler extends SQLiteOpenHelper {
         ArrayList<Article> articleList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
 
-        String select = "Select * from " + Params.TABLE_NAME;
+        String select = "Select * from " + AppGlobals.TABLE_NAME;
         Cursor cursor = db.rawQuery(select, null);
 
         if(cursor.moveToFirst()) {
@@ -58,5 +58,24 @@ public class DbHandler extends SQLiteOpenHelper {
         }
         cursor.close();
         return articleList;
+    }
+
+    public String getTextBodyFromFilename(String fileName) {
+        String query = "Select " + AppGlobals.KEY_BODY + " from " + AppGlobals.TABLE_NAME + " WHERE " + AppGlobals.KEY_NAME + " = \"" + fileName + "\"";
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(query, null);
+
+        if (cursor.moveToFirst()) {
+            try {
+                String ret = cursor.getString(0);
+                cursor.close();
+                return ret;
+            } catch (Exception e) {
+                e.printStackTrace();
+                cursor.close();
+            }
+        }
+        return "ERROR!";
     }
 }
