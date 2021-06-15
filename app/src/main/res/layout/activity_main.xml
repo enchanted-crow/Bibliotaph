@@ -23,7 +23,7 @@
             app:expandedTitleTextAppearance="@style/TextAppearance.AppCompat.Display2"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:title="Bibliotaph"
-            app:toolbarId="@+id/toolbar">
+            app:toolbarId="@+id/homescreen_collapsing_toolbar">
 
             <!--            <androidx.appcompat.widget.Toolbar-->
             <!--                android:id="@+id/toolbar"-->
@@ -33,7 +33,7 @@
             <!--                app:titleTextAppearance="@style/TextAppearance.AppCompat.Display1" />-->
 
             <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
+                android:id="@+id/homescreen_topbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:title="Bibliotaph" />
@@ -78,7 +78,7 @@
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/recycler_view"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
+                        android:layout_height="match_parent"/>
                 </LinearLayout>
             </ScrollView>
 
@@ -128,7 +128,7 @@
             android:layout_marginBottom="24dp"
             android:clickable="true"
             android:contentDescription="@string/pdf_add_button"
-            android:focusable="auto"
+            android:focusable="true"
             android:visibility="invisible"
             android:backgroundTint="@color/LightSeaGreen"
             app:layout_constraintBottom_toTopOf="@+id/add_article_button"
@@ -142,7 +142,7 @@
             android:layout_marginBottom="24dp"
             android:clickable="true"
             android:contentDescription="@string/add_article_button"
-            android:focusable="auto"
+            android:focusable="true"
             android:visibility="invisible"
             android:backgroundTint="@color/LightSeaGreen"
             app:layout_constraintBottom_toTopOf="@+id/add_pdf_nd_article_button"
