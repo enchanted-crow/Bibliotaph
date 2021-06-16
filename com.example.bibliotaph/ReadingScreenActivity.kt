@@ -4,8 +4,6 @@ import android.os.Bundle
 import android.widget.TextView
 import android.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
-import com.example.bibliotaph.params.AppGlobals
-import com.example.bibliotaph.params.AppGlobals.myDB
 
 class ReadingScreenActivity : AppCompatActivity() {
 
@@ -21,20 +19,21 @@ class ReadingScreenActivity : AppCompatActivity() {
 
     private fun displayArticle() {
         val intent = intent
-        val index = intent.getIntExtra("cardArrListIndex", 0)
-        val fileName = AppGlobals.cardList[index].fileName
+        val index = intent.getIntExtra(MainActivity.index, 0)
+        val fileName = MainActivity.articleList[index].fileName
+        val textBody = MainActivity.articleList[index].textBody
 
-//        this shit doesnt work :/ somehow findViewById(R.id.appbar) eta null return kore
         try {
             toolbar = findViewById(R.id.toolbar2)
             toolbar.title = fileName
         } catch (e : Exception) {
             e.printStackTrace()
         }
+        Thread {
+            articleBody = findViewById(R.id.textView3)
 
-        val textBody = myDB.getTextBodyFromFilename(fileName)
+            articleBody.text = textBody
+        }.start()
 
-        articleBody = findViewById(R.id.textView3)
-        articleBody.text = textBody
     }
 }
