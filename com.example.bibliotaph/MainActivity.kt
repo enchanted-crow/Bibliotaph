@@ -16,8 +16,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.bibliotaph.adapters.MyAdapter
 import com.example.bibliotaph.models.Article
 import com.example.bibliotaph.models.CardModel
-import com.example.bibliotaph.params.AppGlobals.cardList
-import com.example.bibliotaph.params.AppGlobals.myDB
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.itextpdf.text.pdf.PdfReader
 import com.itextpdf.text.pdf.parser.PdfTextExtractor
@@ -66,8 +64,13 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
 
 
 //    <Tahmid>
+    companion object {
+        @JvmStatic val index: String = "com.example.bibliotaph.INDEX"
+        @JvmStatic lateinit var articleList: ArrayList<Article>
+    }
     private var inputStream: InputStream? = null
-//    private var myDB: DbHandler? = null
+    private lateinit var dbHandler: DbHandler
+    private var cardList = java.util.ArrayList<CardModel>(1000)
     private var article2add: Article? = null
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
 //    </Tahmid>
@@ -77,9 +80,8 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
         setContentView(R.layout.activity_main)
 
         initAddButton()
-
-        myDB = DbHandler(this);
-        cardList = createCardListFromDB(myDB!!)
+        dbHandler = DbHandler(this)
+        cardList = createCardListFromDB()
 
         linearLayoutManager = LinearLayoutManager(this)
         setupRecyclerView(linearLayoutManager!!)
@@ -87,16 +89,16 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
 
     override fun onCardClick(position: Int) {
         val intent = Intent(this, ReadingScreenActivity::class.java)
-        intent.putExtra("cardArrListIndex", position)
+        intent.putExtra(index, position)
         startActivity(intent)
     }
 
-    private fun createCardListFromDB(myDB: DbHandler) : ArrayList <CardModel> {
-        val articleList = myDB.allArticles;
+    private fun createCardListFromDB() : ArrayList <CardModel> {
+        articleList = dbHandler.allArticles
         val cardList = ArrayList <CardModel> (1000)
         for (article in articleList) {
             val card = CardModel(article.fileName, article.dateAdded)
-            cardList.add(card);
+            cardList.add(card)
         }
         return cardList
     }
@@ -113,7 +115,7 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
     private fun initAddButton() {
         addButton = findViewById(R.id.add_pdf_nd_article_button)
         addButton.setOnClickListener {
-            onClickAddButton(addButtonExpanded)
+            onClickAddButton()
         }
 
         addPDFButton = findViewById(R.id.add_pdf_button)
@@ -129,7 +131,7 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
         }
     }
 
-    private fun onClickAddButton(function: Boolean) {
+    private fun onClickAddButton() {
         setVisibility(addButtonExpanded)
         setAnimation(addButtonExpanded)
         addButtonExpanded = !addButtonExpanded
@@ -183,7 +185,7 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
         return pdfName.substring(0, pdfName.lastIndexOf("."))
     }
 
-    private fun extractTextPdfFile(uri: Uri) {
+    private fun extractTextPdfFile(uri: Uri): String {
         try {
             inputStream = this@MainActivity.contentResolver.openInputStream(uri)
         } catch (e: FileNotFoundException) {
@@ -199,10 +201,10 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
                     .append("\n")
             }
             reader.close()
-            article2add!!.textBody = fileContent.toString()
         } catch (e: IOException) {
             e.printStackTrace()
         }
+        return fileContent.toString()
     }
 
     private var pdfResultLauncher = registerForActivityResult(
@@ -211,23 +213,26 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
         if (result.resultCode == RESULT_OK) {
             val data = result.data
             if (data != null) {
-                val uri = data.data
+                val loadingDialog = LoadingDialog(this)
+                loadingDialog.startLoadingDialog()
+                Thread {
+                    val uri = data.data
 
-                val pdfName = extractPdfName(uri!!)
+                    val pdfName = extractPdfName(uri!!)
+                    val pdfBody = extractTextPdfFile(uri)
+                    val dateAdded = dateFormat.format(Date())
 
-                article2add = Article()
+                    article2add = Article(pdfName, pdfBody, dateAdded)
+                    dbHandler.addArticle(article2add)
+                    articleList.add(article2add!!)
+                    val card2add = CardModel(article2add!!.fileName, article2add!!.dateAdded)
+                    cardList.add(card2add)
+                    runOnUiThread {
+                        myAdapter.notifyDataSetChanged()
+                    }
+                    loadingDialog.dismissDialog()
+                }.start()
 
-                extractTextPdfFile(uri)
-
-                article2add!!.fileName = pdfName
-                val dateAdded = dateFormat.format(Date())
-
-                article2add!!.dateAdded = dateAdded
-                myDB!!.addArticle(article2add)
-
-                val card2add = CardModel(article2add!!.fileName, article2add!!.dateAdded)
-                cardList.add(card2add)
-                myAdapter.notifyDataSetChanged()
             }
         }
     }
@@ -238,12 +243,14 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
         if (result.resultCode == Activity.RESULT_OK) {
             val data: Intent? = result.data
             if (data != null) {
+
                 val articleName = data.getStringExtra(WebActivity.TITLE)
                 val articleBody = data.getStringExtra(WebActivity.BODY)
                 val dateAdded = dateFormat.format(Date())
-                article2add = Article(articleName, articleBody, dateAdded)
-                myDB!!.addArticle(article2add)
 
+                article2add = Article(articleName, articleBody, dateAdded)
+                dbHandler.addArticle(article2add)
+                articleList.add(article2add!!)
                 val card2add = CardModel(article2add!!.fileName, article2add!!.dateAdded)
                 cardList.add(card2add)
                 myAdapter.notifyDataSetChanged()
