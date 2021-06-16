@@ -16,11 +16,13 @@ import java.io.IOException;
 
 public class WebActivity extends AppCompatActivity {
 
-    public static final String TITLE = "com.example.pdfFinder.TITLE";
-    public static final String BODY = "com.example.pdfFinder.BODY";
+    public static final String TITLE = "com.example.bibliotaph.TITLE";
+    public static final String BODY = "com.example.bibliotaph.BODY";
     private WebView webView;
 
     private void extractTextArticle(String url) {
+        LoadingDialog loadingDialog = new LoadingDialog(WebActivity.this);
+        loadingDialog.startLoadingDialog();
         new Thread(() -> {
             try {
                 StringBuilder articleBody = new StringBuilder();
@@ -40,6 +42,7 @@ public class WebActivity extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            loadingDialog.dismissDialog();
 
         }).start();
     }
