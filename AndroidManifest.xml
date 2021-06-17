@@ -25,18 +25,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".ReadingScreenActivity"
-            android:label="@string/title_activity_reading_screen">
-
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+        <activity android:name=".ReadingScreenActivity" android:parentActivityName=".MainActivity">
         </activity>
 
-        <activity android:name=".WebActivity">
+        <activity android:name=".WebActivity" android:parentActivityName=".MainActivity">
 
         </activity>
 
