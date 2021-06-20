@@ -2,9 +2,7 @@ package com.example.bibliotaph
 
 import android.app.Activity
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.provider.OpenableColumns
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
@@ -17,11 +15,6 @@ import com.example.bibliotaph.adapters.MyAdapter
 import com.example.bibliotaph.models.Article
 import com.example.bibliotaph.models.CardModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.itextpdf.text.pdf.PdfReader
-import com.itextpdf.text.pdf.parser.PdfTextExtractor
-import java.io.FileNotFoundException
-import java.io.IOException
-import java.io.InputStream
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -68,7 +61,6 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
         @JvmStatic val index: String = "com.example.bibliotaph.INDEX"
         @JvmStatic lateinit var articleList: ArrayList<Article>
     }
-    private var inputStream: InputStream? = null
     private lateinit var dbHandler: DbHandler
     private var cardList = java.util.ArrayList<CardModel>(1000)
     private var article2add: Article? = null
@@ -176,37 +168,6 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
         articleResultLauncher.launch(intent)
     }
 
-    private fun extractPdfName(uri: Uri): String {
-        val cursor = contentResolver.query(uri, null, null, null, null)
-        val nameIndex = cursor!!.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-        cursor.moveToFirst()
-        val pdfName = cursor.getString(nameIndex)
-        cursor.close()
-        return pdfName.substring(0, pdfName.lastIndexOf("."))
-    }
-
-    private fun extractTextPdfFile(uri: Uri): String {
-        try {
-            inputStream = this@MainActivity.contentResolver.openInputStream(uri)
-        } catch (e: FileNotFoundException) {
-            e.printStackTrace()
-        }
-        val fileContent = StringBuilder()
-        val reader: PdfReader
-        try {
-            reader = PdfReader(inputStream)
-            val pages = reader.numberOfPages
-            for (i in 1..pages) {
-                fileContent.append(PdfTextExtractor.getTextFromPage(reader, i).trim { it <= ' ' })
-                    .append("\n")
-            }
-            reader.close()
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-        return fileContent.toString()
-    }
-
     private var pdfResultLauncher = registerForActivityResult(
         StartActivityForResult()
     ) { result ->
@@ -218,8 +179,8 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
                 Thread {
                     val uri = data.data
 
-                    val pdfName = extractPdfName(uri!!)
-                    val pdfBody = extractTextPdfFile(uri)
+                    val pdfName = PdfProcessor.extractPdfName(this, uri!!)
+                    val pdfBody = PdfProcessor.extractTextPdfFile(this, uri)
                     val dateAdded = dateFormat.format(Date())
 
                     article2add = Article(pdfName, pdfBody, dateAdded)
