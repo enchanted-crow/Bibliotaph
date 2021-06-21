@@ -3,6 +3,9 @@ package com.example.bibliotaph
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
@@ -48,8 +51,8 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
 
 //    state variables
     private var addButtonExpanded : Boolean = false
+    private var toolbar : androidx.appcompat.widget.Toolbar? = null
 
-//    private var cardList = ArrayList<CardModel>(1000)
     private lateinit var myAdapter : MyAdapter
     private var linearLayoutManager : LinearLayoutManager? = null
 //    </Jawad>
@@ -62,6 +65,7 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
         @JvmStatic lateinit var articleList: ArrayList<Article>
     }
     private lateinit var dbHandler: DbHandler
+    private var sortIndex: Int = 0
     private var cardList = java.util.ArrayList<CardModel>(1000)
     private var article2add: Article? = null
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
@@ -72,8 +76,10 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
         setContentView(R.layout.activity_main)
 
         initAddButton()
+        initToolbar()
+
         dbHandler = DbHandler(this)
-        cardList = createCardListFromDB()
+        createCardListFromDB()
 
         linearLayoutManager = LinearLayoutManager(this)
         setupRecyclerView(linearLayoutManager!!)
@@ -85,14 +91,13 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
         startActivity(intent)
     }
 
-    private fun createCardListFromDB() : ArrayList <CardModel> {
-        articleList = dbHandler.allArticles
-        val cardList = ArrayList <CardModel> (1000)
+    private fun createCardListFromDB() {
+        articleList = dbHandler.getAllArticles(sortIndex)
+        cardList.clear()
         for (article in articleList) {
             val card = CardModel(article.fileName, article.dateAdded)
             cardList.add(card)
         }
-        return cardList
     }
 
     private fun setupRecyclerView(layoutManager: RecyclerView.LayoutManager) {
@@ -102,6 +107,48 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
         recyclerView.adapter = myAdapter
 
         recyclerView.layoutManager = layoutManager
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+//            R.id.sort_by -> {
+//                Toast.makeText(this, "Sort By", Toast.LENGTH_SHORT).show()
+//            }
+            R.id.settings -> {
+                Toast.makeText(this, "Settings", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this@MainActivity, SettingsActivity::class.java)
+                startActivity(intent)
+            }
+            R.id.about -> {
+                Toast.makeText(this, "About", Toast.LENGTH_SHORT).show()
+            }
+            R.id.search -> {
+                Toast.makeText(this, "Search", Toast.LENGTH_SHORT).show()
+            }
+            R.id.sort_by_date -> {
+                Toast.makeText(this, "Sort by date", Toast.LENGTH_SHORT).show()
+                sortIndex = 0
+                createCardListFromDB()
+                myAdapter.notifyDataSetChanged()
+            }
+            R.id.sort_by_alphabet -> {
+                Toast.makeText(this, "Sort by name", Toast.LENGTH_SHORT).show()
+                sortIndex = 1
+                createCardListFromDB()
+                myAdapter.notifyDataSetChanged()
+            }
+        }
+        return true
+    }
+
+    private fun initToolbar() {
+        toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
     }
 
     private fun initAddButton() {
@@ -185,9 +232,7 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
 
                     article2add = Article(pdfName, pdfBody, dateAdded)
                     dbHandler.addArticle(article2add)
-                    articleList.add(article2add!!)
-                    val card2add = CardModel(article2add!!.fileName, article2add!!.dateAdded)
-                    cardList.add(card2add)
+                    createCardListFromDB()
                     runOnUiThread {
                         myAdapter.notifyDataSetChanged()
                     }
@@ -211,9 +256,7 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
 
                 article2add = Article(articleName, articleBody, dateAdded)
                 dbHandler.addArticle(article2add)
-                articleList.add(article2add!!)
-                val card2add = CardModel(article2add!!.fileName, article2add!!.dateAdded)
-                cardList.add(card2add)
+                createCardListFromDB()
                 myAdapter.notifyDataSetChanged()
             }
         }
