@@ -8,12 +8,11 @@ import androidx.appcompat.app.AppCompatActivity
 class ReadingScreenActivity : AppCompatActivity() {
 
     private lateinit var articleBody : TextView
-    private lateinit var toolbar: Toolbar
+    private lateinit var toolbar : androidx.appcompat.widget.Toolbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_reading_screen)
-
         displayArticle()
     }
 
@@ -24,16 +23,17 @@ class ReadingScreenActivity : AppCompatActivity() {
         val textBody = MainActivity.articleList[index].textBody
 
         try {
-            toolbar = findViewById(R.id.toolbar2)
+            toolbar = findViewById(R.id.reading_screen_top_toolbar)
             toolbar.title = fileName
+            setSupportActionBar(toolbar)
+            supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         } catch (e : Exception) {
             e.printStackTrace()
         }
-        Thread {
-            articleBody = findViewById(R.id.textView3)
 
-            articleBody.text = textBody
-        }.start()
+        articleBody = findViewById(R.id.article_body)
+        articleBody.text = textBody
 
     }
+
 }
