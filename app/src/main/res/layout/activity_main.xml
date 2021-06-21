@@ -8,7 +8,7 @@
     android:textAlignment="center">
 
     <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appbar"
+        android:id="@+id/homescreen_appbar"
         android:layout_width="match_parent"
         android:layout_height="192dp"
         android:fitsSystemWindows="true"
@@ -18,25 +18,21 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
+            android:nestedScrollingEnabled="false"
+            app:collapsedTitleGravity="start"
             app:contentScrim="?attr/colorPrimary"
             app:expandedTitleGravity="top|left"
             app:expandedTitleTextAppearance="@style/TextAppearance.AppCompat.Display2"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:title="Bibliotaph"
-            app:toolbarId="@+id/homescreen_collapsing_toolbar">
-
-            <!--            <androidx.appcompat.widget.Toolbar-->
-            <!--                android:id="@+id/toolbar"-->
-            <!--                android:layout_width="match_parent"-->
-            <!--                android:layout_height="wrap_content"-->
-            <!--                android:layout_margin="8dp"-->
-            <!--                app:titleTextAppearance="@style/TextAppearance.AppCompat.Display1" />-->
+            app:title="@string/app_name"
+            app:toolbarId="@+id/collapsing_toolbar">
 
             <androidx.appcompat.widget.Toolbar
-                android:id="@+id/homescreen_topbar"
+                android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                app:title="Bibliotaph" />
+                android:layout_gravity="bottom|top"
+                app:layout_collapseMode="pin" />
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
@@ -54,7 +50,7 @@
             tools:context=".MainActivity">
 
             <androidx.constraintlayout.widget.Barrier
-                android:id="@+id/barrier3"
+                android:id="@+id/reading_screen_top_barrier"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:barrierDirection="top" />
@@ -93,7 +89,7 @@
         android:layout_gravity="bottom">
 
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/materialCardView"
+            android:id="@+id/reading_screen_playback_card_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
@@ -109,7 +105,7 @@
                 android:background="@color/gray" />
 
             <TextView
-                android:id="@+id/recent_article_name"
+                android:id="@+id/main_screen_playback_article_name"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginStart="32dp"
@@ -160,7 +156,7 @@
             android:focusable="true"
             android:backgroundTint="@color/SpringGreen"
             android:src='@android:drawable/ic_input_add'
-            app:layout_constraintBottom_toTopOf="@+id/materialCardView"
+            app:layout_constraintBottom_toTopOf="@+id/reading_screen_playback_card_view"
             app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

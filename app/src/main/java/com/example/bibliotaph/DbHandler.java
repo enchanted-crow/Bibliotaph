@@ -59,23 +59,4 @@ public class DbHandler extends SQLiteOpenHelper {
         cursor.close();
         return articleList;
     }
-
-    public String getTextBodyFromFilename(String fileName) {
-        String query = "Select " + AppGlobals.KEY_BODY + " from " + AppGlobals.TABLE_NAME + " WHERE " + AppGlobals.KEY_NAME + " = \"" + fileName + "\"";
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        Cursor cursor = db.rawQuery(query, null);
-
-        if (cursor.moveToFirst()) {
-            try {
-                String ret = cursor.getString(0);
-                cursor.close();
-                return ret;
-            } catch (Exception e) {
-                e.printStackTrace();
-                cursor.close();
-            }
-        }
-        return "ERROR!";
-    }
 }

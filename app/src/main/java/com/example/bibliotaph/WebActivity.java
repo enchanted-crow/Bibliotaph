@@ -16,30 +16,34 @@ import java.io.IOException;
 
 public class WebActivity extends AppCompatActivity {
 
-    public static final String TITLE = "com.example.pdfFinder.TITLE";
-    public static final String BODY = "com.example.pdfFinder.BODY";
+    public static final String TITLE = "com.example.bibliotaph.TITLE";
+    public static final String BODY = "com.example.bibliotaph.BODY";
     private WebView webView;
 
     private void extractTextArticle(String url) {
+        LoadingDialog loadingDialog = new LoadingDialog(WebActivity.this);
+        loadingDialog.startLoadingDialog();
         new Thread(() -> {
             try {
-                StringBuilder articleBody = new StringBuilder();
+                StringBuilder content = new StringBuilder();
                 Document document = Jsoup.connect(url).get();
                 String title = document.title();
+                title = title.substring(0, title.lastIndexOf("-")-1);
                 Element body = document.getElementById("mw-content-text");
                 Elements paragraphs = body.getElementsByTag("p");
-                for(Element paragraph: paragraphs) {
-                    articleBody.append(paragraph.text()).append("\n");
-                }
+                for(Element paragraph: paragraphs)
+                    content.append(paragraph.text()).append("\n");
+                String articleBody = content.toString().replaceAll("\\[\\d*\\]","");
 
                 Intent intent = new Intent(WebActivity.this, MainActivity.class);
                 intent.putExtra(TITLE, title);
-                intent.putExtra(BODY, articleBody.toString());
+                intent.putExtra(BODY, articleBody);
                 setResult(RESULT_OK, intent);
                 finish();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            loadingDialog.dismissDialog();
 
         }).start();
     }
