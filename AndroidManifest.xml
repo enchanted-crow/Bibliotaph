@@ -3,8 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.bibliotaph">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28"
@@ -17,7 +16,9 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.MyApp">
+        android:theme="@style/Theme.Bibliotaph">
+        <activity android:name=".SettingsActivity"
+            android:parentActivityName=".MainActivity"></activity>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,13 +26,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ReadingScreenActivity" android:parentActivityName=".MainActivity">
-        </activity>
-
-        <activity android:name=".WebActivity" android:parentActivityName=".MainActivity">
-
-        </activity>
-
+        <activity
+            android:name=".ReadingScreenActivity"
+            android:parentActivityName=".MainActivity"></activity>
+        <activity
+            android:name=".WebActivity"
+            android:parentActivityName=".MainActivity"></activity>
     </application>
 
 </manifest>
