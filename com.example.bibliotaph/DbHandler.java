@@ -40,11 +40,20 @@ public class DbHandler extends SQLiteOpenHelper {
         Log.i("database", article.getTextBody());
     }
 
-    public ArrayList<Article> getAllArticles() {
+    public ArrayList<Article> getAllArticles(int sortIndex) {
         ArrayList<Article> articleList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
+        String select;
 
-        String select = "Select * from " + AppGlobals.TABLE_NAME;
+        if(sortIndex == 0) {
+            select = "Select * from " + AppGlobals.TABLE_NAME
+                    + " Order by " + AppGlobals.KEY_DATE + " Desc";
+        }
+        else {
+            select = "Select * from " + AppGlobals.TABLE_NAME
+                    + " Order by Upper(" + AppGlobals.KEY_NAME + ")" + " Asc";
+        }
+
         Cursor cursor = db.rawQuery(select, null);
 
         if(cursor.moveToFirst()) {
