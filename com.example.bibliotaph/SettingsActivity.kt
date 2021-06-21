@@ -9,15 +9,25 @@ import androidx.appcompat.app.AppCompatActivity
 class SettingsActivity : AppCompatActivity() {
 
     private var toolbar : androidx.appcompat.widget.Toolbar? = null
-    private lateinit var seekbarSpeechRate : SeekBar
-    private lateinit var seekbarPitch : SeekBar
-    private lateinit var valueSpeechRate : TextView
+    private lateinit var tvValueSpeechRate: TextView
+    private lateinit var seekbarSpeechRate: SeekBar
+    private lateinit var seekbarPitch: SeekBar
+
+    companion object {
+        private var speechRate : Float = 0.0f
+        private var pitch : Float = 0.0f
+        private var initCheckSeekBar : Boolean = false
+
+        fun getPitch () : Float { return pitch }
+        fun getSpeechRate () : Float { return speechRate }
+    }
 
     private val speechRateStepSize = 25
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
+
         initToolbar()
         initSeekBars()
     }
@@ -25,33 +35,62 @@ class SettingsActivity : AppCompatActivity() {
     private fun initToolbar() {
         toolbar = findViewById(R.id.settings_toolbar)
         setSupportActionBar(toolbar)
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)    // back button
+        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
     }
 
     private fun initSeekBars() {
-        valueSpeechRate = findViewById(R.id.value_speech_rate)
+        tvValueSpeechRate = findViewById(R.id.tv_value_speech_rate)
         seekbarSpeechRate = findViewById(R.id.seekBar_speech_rate)
+        seekbarPitch = findViewById(R.id.seekBar_pitch)
 
         seekbarSpeechRate.max = ((300 - speechRateStepSize.toFloat()) / speechRateStepSize.toFloat()).toInt()
-        seekbarSpeechRate.progress = (100 / speechRateStepSize)
+
+        if(initCheckSeekBar) {
+            seekbarSpeechRate.progress = (speechRate * seekbarSpeechRate.max).toInt()
+            seekbarPitch.progress = (pitch * seekbarPitch.max).toInt()
+
+            val v = speechRate / seekbarSpeechRate.max
+            tvValueSpeechRate.text = "$v x"
+        }
+        else {
+            seekbarSpeechRate.progress = (100 / speechRateStepSize)
+
+            speechRate = seekbarSpeechRate.progress.toFloat() / seekbarSpeechRate.max
+            pitch = seekbarPitch.progress.toFloat() / seekbarPitch.max
+        }
 
         seekbarSpeechRate.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
 
             override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
-                // Display the current progress of SeekBar
                 val v = speechRateStepSize * (i.toFloat() + 1) / 100
-                valueSpeechRate.text = "$v x"
+                tvValueSpeechRate.text = "$v x"
+
+                speechRate = seekbarSpeechRate.progress.toFloat() / seekbarSpeechRate.max
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar) {
-                // Do something
                 Toast.makeText(applicationContext, "start tracking", Toast.LENGTH_SHORT).show()
             }
 
             override fun onStopTrackingTouch(seekBar: SeekBar) {
-                // Do something
                 Toast.makeText(applicationContext, "stop tracking", Toast.LENGTH_SHORT).show()
             }
         })
+
+        seekbarPitch.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+
+            override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
+                pitch = seekbarPitch.progress.toFloat() / seekbarPitch.max
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar) {
+                Toast.makeText(applicationContext, "start tracking", Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar) {
+                Toast.makeText(applicationContext, "stop tracking", Toast.LENGTH_SHORT).show()
+            }
+        })
+        initCheckSeekBar = true
     }
 }
