@@ -68,4 +68,7 @@ Start Lesson 4</string>
     <string name="settings">Settings</string>
     <string name="about">About</string>
     <string name="search">Search</string>
+    <string name="last_added">Last added</string>
+    <string name="a_z">A-Z</string>
+    <string name="loading">Loading…</string>
 </resources>
