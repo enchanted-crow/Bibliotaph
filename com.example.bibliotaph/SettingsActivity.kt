@@ -1,5 +1,6 @@
 package com.example.bibliotaph
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.SeekBar
 import android.widget.TextView
@@ -13,13 +14,14 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var seekbarSpeechRate: SeekBar
     private lateinit var seekbarPitch: SeekBar
 
-    companion object {
-        private var speechRate : Float = 0.0f
-        private var pitch : Float = 0.0f
-        private var initCheckSeekBar : Boolean = false
+    private var speechRate : Float = 0.0f
+    private var pitch : Float = 0.0f
+    private var initCheckSeekBar : Boolean = false
 
-        fun getPitch () : Float { return pitch }
-        fun getSpeechRate () : Float { return speechRate }
+    companion object {
+        const val SHARED_PREFS : String = "sharedPrefs"
+        const val SPEECHRATE : String = "speechRate"
+        const val PITCH : String = "pitch"
     }
 
     private val speechRateStepSize = 25
@@ -28,8 +30,14 @@ class SettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
+        loadData()
         initToolbar()
         initSeekBars()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        saveDate()
     }
 
     private fun initToolbar() {
@@ -55,7 +63,7 @@ class SettingsActivity : AppCompatActivity() {
         else {
             seekbarSpeechRate.progress = (100 / speechRateStepSize)
 
-            speechRate = seekbarSpeechRate.progress.toFloat() / seekbarSpeechRate.max
+            speechRate = seekbarSpeechRate.progress.toFloat()*3 / seekbarSpeechRate.max
             pitch = seekbarPitch.progress.toFloat() / seekbarPitch.max
         }
 
@@ -65,7 +73,7 @@ class SettingsActivity : AppCompatActivity() {
                 val v = speechRateStepSize * (i.toFloat() + 1) / 100
                 tvValueSpeechRate.text = "$v x"
 
-                speechRate = seekbarSpeechRate.progress.toFloat() / seekbarSpeechRate.max
+                speechRate = seekbarSpeechRate.progress.toFloat()*3 / seekbarSpeechRate.max
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar) {
@@ -92,5 +100,22 @@ class SettingsActivity : AppCompatActivity() {
             }
         })
         initCheckSeekBar = true
+    }
+
+    private fun saveDate() {
+        val sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE)
+        val editor: SharedPreferences.Editor = sharedPreferences.edit()
+
+        editor.putFloat(SPEECHRATE, speechRate)
+        editor.putFloat(PITCH, pitch)
+
+        editor.apply()
+    }
+
+    private fun loadData() {
+        val sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE)
+
+        speechRate = sharedPreferences.getFloat(SPEECHRATE, 1.0f)
+        pitch = sharedPreferences.getFloat(PITCH, 1.0f)
     }
 }
