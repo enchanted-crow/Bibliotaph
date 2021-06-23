@@ -14,20 +14,25 @@ class ReadingScreenActivity : AppCompatActivity() {
     private lateinit var articleBody : TextView
     private lateinit var toolbar : androidx.appcompat.widget.Toolbar
     private lateinit var buttonPlay : Button
-    private lateinit var myTTS : TextToSpeech
+    private lateinit var tts : TextToSpeech
+
+    //saved variables
+    private var speechRate : Float = 1.0f
+    private var pitch : Float = 1.0f
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_reading_screen)
+
+        loadData()
         displayArticle()
 
         buttonPlay = findViewById(R.id.reading_screen_play_button)
-
-        myTTS = TextToSpeech(this) { status ->
+        tts = TextToSpeech(this) { status ->
             if (status == TextToSpeech.SUCCESS) {
-                val result: Int = myTTS.setLanguage(Locale.US)
+                val result: Int = tts.setLanguage(Locale.ENGLISH)
                 if (result == TextToSpeech.LANG_MISSING_DATA
-                        || result == TextToSpeech.LANG_NOT_SUPPORTED
+                    || result == TextToSpeech.LANG_NOT_SUPPORTED
                 ) {
                     Log.e("TTS", "Language not supported")
                 } else {
@@ -41,19 +46,27 @@ class ReadingScreenActivity : AppCompatActivity() {
         buttonPlay.setOnClickListener { speak() }
     }
 
+    private fun loadData() {
+        val sharedPreferences = getSharedPreferences(SettingsActivity.SHARED_PREFS, MODE_PRIVATE)
+
+        speechRate = sharedPreferences.getFloat(SettingsActivity.SPEECHRATE, 1.0f)
+        pitch = sharedPreferences.getFloat(SettingsActivity.PITCH, 1.0f)
+    }
+
     private fun speak() {
         val text: String = articleBody.text.toString()
-        var pitch = SettingsActivity.getPitch()
-        if (pitch < 0.1) pitch = 0.1f
-        var speed = SettingsActivity.getSpeechRate()
-        if (speed < 0.1) speed = 0.1f
 
-        Log.d("TTS", "Speech rate: $speed")
-        Log.d("TTS", "Speech rate: $pitch")
 
-        myTTS.setPitch(pitch)
-        myTTS.setSpeechRate(speed)
-        val succ = myTTS.speak(text, TextToSpeech.QUEUE_FLUSH, null, null)
+//        if (speechRate < 0.1f) speechRate = 0.1f
+//        if (pitch < 0.1f) pitch = 0.1f
+
+        Log.d("TTS", "Speech rate: $speechRate")
+        Log.d("TTS", "Pitch: $pitch")
+
+
+        tts.setSpeechRate(speechRate)
+        tts.setPitch(pitch)
+        val succ = tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, null)
 
         Toast.makeText(this, succ.toString(), Toast.LENGTH_SHORT).show()
     }
@@ -64,20 +77,24 @@ class ReadingScreenActivity : AppCompatActivity() {
         val fileName = MainActivity.articleList[index].fileName
         val textBody = MainActivity.articleList[index].textBody
 
-        toolbar = findViewById(R.id.reading_screen_top_toolbar)
-        toolbar.title = fileName
-        setSupportActionBar(toolbar)
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        try {
+            toolbar = findViewById(R.id.reading_screen_top_toolbar)
+            toolbar.title = fileName
+            setSupportActionBar(toolbar)
+            supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        } catch (e : Exception) {
+            e.printStackTrace()
+        }
 
-        Thread {
-            articleBody = findViewById(R.id.article_body)
-            articleBody.text = textBody
-        }.start()
+        articleBody = findViewById(R.id.article_body)
+        articleBody.text = textBody
+
     }
 
     override fun onDestroy() {
-        myTTS.stop()
-        myTTS.shutdown()
+        tts.stop()
+        tts.shutdown()
         super.onDestroy()
     }
+
 }
