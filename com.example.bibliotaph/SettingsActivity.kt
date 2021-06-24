@@ -6,6 +6,7 @@ import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import kotlin.math.roundToInt
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -14,9 +15,8 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var seekbarSpeechRate: SeekBar
     private lateinit var seekbarPitch: SeekBar
 
-    private var speechRate : Float = 0.0f
-    private var pitch : Float = 0.0f
-    private var initCheckSeekBar : Boolean = false
+    private var speechRate : Float = 1.0f
+    private var pitch : Float = 1.0f
 
     companion object {
         const val SHARED_PREFS : String = "sharedPrefs"
@@ -24,7 +24,13 @@ class SettingsActivity : AppCompatActivity() {
         const val PITCH : String = "pitch"
     }
 
-    private val speechRateStepSize = 25
+    private val speechRateStepSize = 0.25f
+    private val minSpeechRate = 0.25f
+    private val maxSpeechRate = 2.00f
+
+    private val pitchStepSize = 0.25f
+    private val minPitch = 0.25f
+    private val maxPitch = 2.00f
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,32 +54,21 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun initSeekBars() {
         tvValueSpeechRate = findViewById(R.id.tv_value_speech_rate)
+        var progressText: String = "%.2f x".format(speechRate)
+        tvValueSpeechRate.text = progressText
+
         seekbarSpeechRate = findViewById(R.id.seekBar_speech_rate)
-        seekbarPitch = findViewById(R.id.seekBar_pitch)
 
-        seekbarSpeechRate.max = ((300 - speechRateStepSize.toFloat()) / speechRateStepSize.toFloat()).toInt()
-
-        if(initCheckSeekBar) {
-            seekbarSpeechRate.progress = (speechRate * seekbarSpeechRate.max).toInt()
-            seekbarPitch.progress = (pitch * seekbarPitch.max).toInt()
-
-            val v = speechRate / seekbarSpeechRate.max
-            tvValueSpeechRate.text = "$v x"
-        }
-        else {
-            seekbarSpeechRate.progress = (100 / speechRateStepSize)
-
-            speechRate = seekbarSpeechRate.progress.toFloat()*3 / seekbarSpeechRate.max
-            pitch = seekbarPitch.progress.toFloat() / seekbarPitch.max
-        }
+        seekbarSpeechRate.max = ((maxSpeechRate-minSpeechRate)/speechRateStepSize).roundToInt()
+        val speechRateProgress: Int = ((speechRate-minSpeechRate)/speechRateStepSize).roundToInt()
+        seekbarSpeechRate.progress = speechRateProgress
 
         seekbarSpeechRate.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
 
-            override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
-                val v = speechRateStepSize * (i.toFloat() + 1) / 100
-                tvValueSpeechRate.text = "$v x"
-
-                speechRate = seekbarSpeechRate.progress.toFloat()*3 / seekbarSpeechRate.max
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, b: Boolean) {
+                speechRate = minSpeechRate+(progress*speechRateStepSize)
+                progressText = "%.2f x".format(speechRate)
+                tvValueSpeechRate.text = progressText
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar) {
@@ -84,11 +79,17 @@ class SettingsActivity : AppCompatActivity() {
                 Toast.makeText(applicationContext, "stop tracking", Toast.LENGTH_SHORT).show()
             }
         })
+
+        seekbarPitch = findViewById(R.id.seekBar_pitch)
+
+        seekbarPitch.max = ((maxPitch-minPitch)/pitchStepSize).roundToInt()
+        val pitchProgress: Int = ((pitch-minPitch)/pitchStepSize).roundToInt()
+        seekbarPitch.progress = pitchProgress
 
         seekbarPitch.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
 
-            override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
-                pitch = seekbarPitch.progress.toFloat() / seekbarPitch.max
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, b: Boolean) {
+                pitch = minPitch+(progress*pitchStepSize)
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar) {
@@ -99,7 +100,6 @@ class SettingsActivity : AppCompatActivity() {
                 Toast.makeText(applicationContext, "stop tracking", Toast.LENGTH_SHORT).show()
             }
         })
-        initCheckSeekBar = true
     }
 
     private fun saveDate() {
