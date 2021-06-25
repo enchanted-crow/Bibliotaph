@@ -94,23 +94,65 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_play_button"
+            app:fabCustomSize="48dp"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:backgroundTint="@color/white"
+            android:clickable="true"
+            android:contentDescription="@string/add_button"
+            android:focusable="true"
+            android:src='@drawable/ic_baseline_play_arrow_48'
+            app:elevation="0dp"
+            app:borderWidth="0px"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/SpringGreen"/>
+
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_previous_button"
+            app:fabCustomSize="40dp"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:backgroundTint="@color/white"
+            android:clickable="true"
+            android:contentDescription="@string/add_button"
+            android:focusable="true"
+            android:src='@drawable/ic_baseline_skip_previous_24'
+            app:borderWidth="0px"
+            app:elevation="0dp"
+            app:layout_constraintBottom_toBottomOf="@id/fab_play_button"
+            app:layout_constraintEnd_toStartOf="@id/fab_play_button"
+            app:layout_constraintTop_toTopOf="@id/fab_play_button"
+            app:tint="@color/SpringGreen" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_next_button"
+            app:fabCustomSize="40dp"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:backgroundTint="@color/white"
+            android:clickable="true"
+            android:contentDescription="@string/add_button"
+            android:focusable="true"
+            android:src='@drawable/ic_baseline_skip_next_24'
+            app:borderWidth="0px"
+            app:elevation="0dp"
+            app:layout_constraintBottom_toBottomOf="@id/fab_play_button"
+            app:layout_constraintStart_toEndOf="@id/fab_play_button"
+            app:layout_constraintTop_toTopOf="@id/fab_play_button"
+            app:tint="@color/SpringGreen" />
+
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/reading_screen_play_button"
-        android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:layout_gravity="bottom|center"
-        android:layout_margin="8dp"
-        android:backgroundTint="@color/white"
-        android:clickable="true"
-        android:contentDescription="@string/add_button"
-        android:focusable="true"
-        android:src='@drawable/ic_baseline_play_arrow_24'
-        app:elevation="2dp"
-        app:fabCustomSize="48dp"
-        app:tint="@color/SpringGreen" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
