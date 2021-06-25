@@ -2,6 +2,7 @@ package com.example.bibliotaph
 
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.widget.Button
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
@@ -14,6 +15,7 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var tvValueSpeechRate: TextView
     private lateinit var seekbarSpeechRate: SeekBar
     private lateinit var seekbarPitch: SeekBar
+    private lateinit var buttonReset: Button
 
     private var speechRate : Float = 1.0f
     private var pitch : Float = 1.0f
@@ -26,11 +28,14 @@ class SettingsActivity : AppCompatActivity() {
 
     private val speechRateStepSize = 0.25f
     private val minSpeechRate = 0.25f
-    private val maxSpeechRate = 2.00f
+    private val maxSpeechRate = 3.00f
 
     private val pitchStepSize = 0.25f
     private val minPitch = 0.25f
     private val maxPitch = 2.00f
+
+    private val defaultSpeechRate = 1.0f
+    private val defaultPitch = 1.0f
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +44,7 @@ class SettingsActivity : AppCompatActivity() {
         loadData()
         initToolbar()
         initSeekBars()
+        initResetButton()
     }
 
     override fun onDestroy() {
@@ -102,6 +108,24 @@ class SettingsActivity : AppCompatActivity() {
         })
     }
 
+    private fun initResetButton() {
+        buttonReset = findViewById(R.id.settings_reset_btn)
+
+        buttonReset.setOnClickListener {
+            val sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE)
+
+            speechRate = defaultSpeechRate
+            pitch = defaultPitch
+
+            val progressText: String = "%.2f x".format(speechRate)
+            tvValueSpeechRate.text = progressText
+            seekbarSpeechRate.progress = ((speechRate - minSpeechRate) / speechRateStepSize).toInt()
+
+            seekbarPitch.progress = ((pitch - minPitch) / pitchStepSize).toInt()
+            Toast.makeText(this, "reset", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     private fun saveDate() {
         val sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE)
         val editor: SharedPreferences.Editor = sharedPreferences.edit()
@@ -115,7 +139,7 @@ class SettingsActivity : AppCompatActivity() {
     private fun loadData() {
         val sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE)
 
-        speechRate = sharedPreferences.getFloat(SPEECHRATE, 1.0f)
-        pitch = sharedPreferences.getFloat(PITCH, 1.0f)
+        speechRate = sharedPreferences.getFloat(SPEECHRATE, defaultSpeechRate)
+        pitch = sharedPreferences.getFloat(PITCH, defaultPitch)
     }
 }
