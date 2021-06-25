@@ -2,11 +2,14 @@ package com.example.bibliotaph
 
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.speech.tts.TextToSpeech
+import android.util.Log
 import android.widget.Button
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import java.util.*
 import kotlin.math.roundToInt
 
 class SettingsActivity : AppCompatActivity() {
@@ -16,6 +19,8 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var seekbarSpeechRate: SeekBar
     private lateinit var seekbarPitch: SeekBar
     private lateinit var buttonReset: Button
+    private lateinit var buttonPlay: Button
+    private lateinit var tts : TextToSpeech
 
     private var speechRate : Float = 1.0f
     private var pitch : Float = 1.0f
@@ -45,6 +50,7 @@ class SettingsActivity : AppCompatActivity() {
         initToolbar()
         initSeekBars()
         initResetButton()
+        initPlayButton()
     }
 
     override fun onDestroy() {
@@ -78,11 +84,9 @@ class SettingsActivity : AppCompatActivity() {
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar) {
-                Toast.makeText(applicationContext, "start tracking", Toast.LENGTH_SHORT).show()
             }
 
             override fun onStopTrackingTouch(seekBar: SeekBar) {
-                Toast.makeText(applicationContext, "stop tracking", Toast.LENGTH_SHORT).show()
             }
         })
 
@@ -99,11 +103,9 @@ class SettingsActivity : AppCompatActivity() {
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar) {
-                Toast.makeText(applicationContext, "start tracking", Toast.LENGTH_SHORT).show()
             }
 
             override fun onStopTrackingTouch(seekBar: SeekBar) {
-                Toast.makeText(applicationContext, "stop tracking", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -123,6 +125,40 @@ class SettingsActivity : AppCompatActivity() {
 
             seekbarPitch.progress = ((pitch - minPitch) / pitchStepSize).toInt()
             Toast.makeText(this, "reset", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun initPlayButton() {
+        buttonPlay = findViewById(R.id.settings_play_btn)
+        buttonPlay.isEnabled = false
+        initTTS()
+        buttonPlay.setOnClickListener{ speak() }
+    }
+
+    private fun speak() {
+        val text: String = "This is an example of speech synthesis in English."
+
+        tts.setSpeechRate(speechRate)
+        tts.setPitch(pitch)
+        val succ = tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, null)
+
+        Toast.makeText(this, succ.toString(), Toast.LENGTH_SHORT).show()
+    }
+
+    private fun initTTS() {
+        tts = TextToSpeech(this) { status ->
+            if (status == TextToSpeech.SUCCESS) {
+                val result: Int = tts.setLanguage(Locale.ENGLISH)
+                if (result == TextToSpeech.LANG_MISSING_DATA
+                        || result == TextToSpeech.LANG_NOT_SUPPORTED
+                ) {
+                    Log.e("TTS", "Language not supported")
+                } else {
+                    buttonPlay.isEnabled = true
+                }
+            } else {
+                Log.e("TTS", "Initialization failed")
+            }
         }
     }
 
