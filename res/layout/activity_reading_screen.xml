@@ -116,6 +116,26 @@
             app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/SpringGreen"/>
 
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_pause_button"
+            app:fabCustomSize="48dp"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:backgroundTint="@color/white"
+            android:contentDescription="@string/add_button"
+            android:clickable="true"
+            android:focusable="true"
+            android:visibility="invisible"
+            android:src='@drawable/ic_baseline_pause_24'
+            app:elevation="0dp"
+            app:borderWidth="0px"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/SpringGreen"/>
+
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_previous_button"
