@@ -3,7 +3,7 @@ package com.example.bibliotaph
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.util.Log
-import android.util.TypedValue
+import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -15,6 +15,7 @@ class ReadingScreenActivity : AppCompatActivity() {
     private lateinit var articleBody : TextView
     private lateinit var toolbar : androidx.appcompat.widget.Toolbar
     private lateinit var buttonPlay : FloatingActionButton
+    private lateinit var buttonPause : FloatingActionButton
     private lateinit var tts : TextToSpeech
 
     //saved variables
@@ -38,6 +39,8 @@ class ReadingScreenActivity : AppCompatActivity() {
     }
 
     private fun speak() {
+        toggleVisibility(true)
+
         val text: String = articleBody.text.toString()
 
         Log.d("TTS", "Speech rate: $speechRate")
@@ -52,11 +55,29 @@ class ReadingScreenActivity : AppCompatActivity() {
 
         Toast.makeText(this, a.toString(), Toast.LENGTH_SHORT).show()
 
-        articleBody.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20F)
+//        articleBody.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20F)
+    }
+
+    private fun pause() {
+        toggleVisibility(false)
+        
+        // do other pause stuff
+    }
+
+    private fun toggleVisibility(toPlay : Boolean) {
+        if(toPlay) {
+            buttonPlay.visibility = View.INVISIBLE
+            buttonPause.visibility = View.VISIBLE
+        }
+        else {
+            buttonPause.visibility = View.INVISIBLE
+            buttonPlay.visibility = View.VISIBLE
+        }
     }
 
     private fun initPlayButton() {
-        buttonPlay = findViewById(R.id.reading_screen_play_button)
+        buttonPlay = findViewById(R.id.fab_play_button)
+        buttonPause = findViewById(R.id.fab_pause_button)
         tts = TextToSpeech(this) { status ->
             if (status == TextToSpeech.SUCCESS) {
                 val result: Int = tts.setLanguage(Locale.ENGLISH)
@@ -73,6 +94,7 @@ class ReadingScreenActivity : AppCompatActivity() {
         }
 
         buttonPlay.setOnClickListener { speak() }
+        buttonPause.setOnClickListener { pause() }
     }
 
     private fun displayArticle() {
