@@ -54,7 +54,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <TextView
+                    <com.example.bibliotaph.textViews.MyTextView
                         android:id="@+id/article_body"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
@@ -107,7 +107,7 @@
             android:clickable="true"
             android:contentDescription="@string/add_button"
             android:focusable="true"
-            android:src='@drawable/ic_baseline_play_arrow_48'
+            android:src='@drawable/ic_baseline_play_arrow_24'
             app:elevation="0dp"
             app:borderWidth="0px"
             app:layout_constraintBottom_toBottomOf="parent"
