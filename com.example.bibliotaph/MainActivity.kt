@@ -32,26 +32,28 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
     private lateinit var addArticleButton : FloatingActionButton
 
     private val rotateOpen : Animation by lazy { AnimationUtils.loadAnimation(
-            this,
-            R.anim.rotate_open_anim
+        this,
+        R.anim.rotate_open_anim
     )}
     private val rotateClose : Animation by lazy { AnimationUtils.loadAnimation(
-            this,
-            R.anim.rotate_close_anim
+        this,
+        R.anim.rotate_close_anim
     )}
     private val fromBottom : Animation by lazy { AnimationUtils.loadAnimation(
-            this,
-            R.anim.from_bottom_anim
+        this,
+        R.anim.from_bottom_anim
     )}
     private val toBottom : Animation by lazy { AnimationUtils.loadAnimation(
-            this,
-            R.anim.to_bottom_anim
+        this,
+        R.anim.to_bottom_anim
     )}
 
     //    state variables
     private var addButtonExpanded : Boolean = false
     private var toolbar : androidx.appcompat.widget.Toolbar? = null
     private lateinit var bottomAppBar : BottomAppBar
+    private lateinit var recentlyPlayedFileName : String
+    private var recentlyPlayedCurrentSentence = 0
 
     private lateinit var myAdapter : MyAdapter
     private var linearLayoutManager : LinearLayoutManager? = null
@@ -60,12 +62,13 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
 
     //    <Tahmid>
     companion object {
-        @JvmStatic val index: String = "com.example.bibliotaph.INDEX"
-        @JvmStatic lateinit var articleList: ArrayList<Article>
+        const val POSITION : String = "com.example.bibliotaph.INDEX"
+        lateinit var articleList : ArrayList<Article>
+        lateinit var dbHandler : DbHandler
     }
-    private lateinit var dbHandler: DbHandler
+
     private var sortIndex: Int = 0
-    private var cardList = java.util.ArrayList<CardModel>(1000)
+    private var cardList = ArrayList<CardModel>(1000)
     private var article2add: Article? = null
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
 //    </Tahmid>
@@ -74,11 +77,12 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        initAddButton()
-        initToolbar()
-
         dbHandler = DbHandler(this)
         createCardListFromDB()
+
+        initAddButton()
+        initToolbar()
+        loadRecentlyPlayedData()
 
         linearLayoutManager = LinearLayoutManager(this)
         setupRecyclerView(linearLayoutManager!!)
@@ -86,7 +90,7 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
 
     override fun onCardClick(position: Int) {
         val intent = Intent(this, ReadingScreenActivity::class.java)
-        intent.putExtra(index, position)
+        intent.putExtra(POSITION, position)
         startActivity(intent)
     }
 
@@ -151,7 +155,8 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
 
         bottomAppBar = findViewById(R.id.bottomAppBar)
         bottomAppBar.setOnClickListener {
-
+            val intent = Intent(this, ReadingScreenActivity::class.java)
+            startActivity(intent)
         }
     }
 
@@ -220,7 +225,7 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
     }
 
     private var pdfResultLauncher = registerForActivityResult(
-            StartActivityForResult()
+        StartActivityForResult()
     ) { result ->
         if (result.resultCode == RESULT_OK) {
             val data = result.data
@@ -248,7 +253,7 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
     }
 
     private var articleResultLauncher = registerForActivityResult(
-            StartActivityForResult()
+        StartActivityForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             val data: Intent? = result.data
@@ -264,5 +269,12 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
                 myAdapter.notifyDataSetChanged()
             }
         }
+    }
+
+    private fun loadRecentlyPlayedData() {
+        val sharedPreferences = getSharedPreferences(ReadingScreenActivity.SHARED_PREFS, MODE_PRIVATE)
+
+        recentlyPlayedFileName = sharedPreferences.getString(ReadingScreenActivity.ARTICLE_NAME, "Article Name")!!
+        recentlyPlayedCurrentSentence = sharedPreferences.getInt(ReadingScreenActivity.CURRENT_SENTENCE, 0)
     }
 }
