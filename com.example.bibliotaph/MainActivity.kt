@@ -3,7 +3,6 @@ package com.example.bibliotaph
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -14,7 +13,7 @@ import androidx.activity.result.contract.ActivityResultContracts.StartActivityFo
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.bibliotaph.adapters.MyAdapter
+import com.example.bibliotaph.adapters.CustomAdapter
 import com.example.bibliotaph.models.Article
 import com.example.bibliotaph.models.CardModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -23,7 +22,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
+class MainActivity : AppCompatActivity(), CustomAdapter.OnCardListener {
 //    <Jawad>
 
 //    view-related variables
@@ -53,7 +52,7 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
     private var addButtonExpanded : Boolean = false
     private var toolbar : androidx.appcompat.widget.Toolbar? = null
 
-    private lateinit var myAdapter : MyAdapter
+    private lateinit var myAdapter : CustomAdapter
     private var linearLayoutManager : LinearLayoutManager? = null
 //    </Jawad>
 
@@ -61,10 +60,11 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
 
 //    <Tahmid>
     companion object {
-        @JvmStatic val index: String = "com.example.bibliotaph.INDEX"
-        @JvmStatic lateinit var articleList: ArrayList<Article>
+        const val POSITION : String = "com.example.bibliotaph.INDEX"
+        lateinit var articleList : ArrayList<Article>
+        lateinit var dbHandler : DbHandler
     }
-    private lateinit var dbHandler: DbHandler
+   // private lateinit var dbHandler: DbHandler
     private var sortIndex: Int = 0
     private var cardList = java.util.ArrayList<CardModel>(1000)
     private var article2add: Article? = null
@@ -87,7 +87,7 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
 
     override fun onCardClick(position: Int) {
         val intent = Intent(this, ReadingScreenActivity::class.java)
-        intent.putExtra(index, position)
+        intent.putExtra(POSITION, position)
         startActivity(intent)
     }
 
@@ -103,7 +103,7 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
     private fun setupRecyclerView(layoutManager: RecyclerView.LayoutManager) {
         recyclerView = findViewById(R.id.recycler_view)
 
-        myAdapter = MyAdapter(cardList, this)
+        myAdapter = CustomAdapter(cardList, this)
         recyclerView.adapter = myAdapter
 
         recyclerView.layoutManager = layoutManager
@@ -116,9 +116,6 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-//            R.id.sort_by -> {
-//                Toast.makeText(this, "Sort By", Toast.LENGTH_SHORT).show()
-//            }
             R.id.settings -> {
                 Toast.makeText(this, "Settings", Toast.LENGTH_SHORT).show()
                 val intent = Intent(this@MainActivity, SettingsActivity::class.java)
