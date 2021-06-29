@@ -1,5 +1,6 @@
 package com.example.bibliotaph
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.util.Log
@@ -11,17 +12,17 @@ import android.view.View.OnTouchListener
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.bibliotaph.textViews.MyTextView
+import androidx.core.content.ContextCompat
+import com.example.bibliotaph.textViews.CustomTextView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 import kotlin.math.roundToInt
 
-
 class ReadingScreenActivity : AppCompatActivity() {
 
-    private lateinit var articleBody : MyTextView
+    private lateinit var articleBody : CustomTextView
     private lateinit var toolbar : androidx.appcompat.widget.Toolbar
     private lateinit var buttonPlay : FloatingActionButton
     private lateinit var buttonPause : FloatingActionButton
@@ -32,6 +33,8 @@ class ReadingScreenActivity : AppCompatActivity() {
     private lateinit var textBody : String
     private lateinit var checkPoints : ArrayList<Int>
     private lateinit var thread: Thread
+    private var selectPauseColor : Int = R.color.rd_screen_selected_pause
+    private var selectPlayColor : Int = R.color.rd_screen_selected_play
 
     private var currentSentence : Int = 0
     private var isPaused : Boolean = true
@@ -40,6 +43,11 @@ class ReadingScreenActivity : AppCompatActivity() {
     private var speechRate : Float = 1.0f
     private var pitch : Float = 1.0f
 
+    companion object {
+        const val SHARED_PREFS : String = "com.example.bibliotaph.readingPrefs"
+        const val ARTICLE_NAME : String = "com.example.bibliotaph.articleName"
+        const val CURRENT_SENTENCE : String = "com.example.bibliotaph.currentSentence"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,8 +62,8 @@ class ReadingScreenActivity : AppCompatActivity() {
     private fun loadData() {
         val sharedPreferences = getSharedPreferences(SettingsActivity.SHARED_PREFS, MODE_PRIVATE)
 
-        speechRate = sharedPreferences.getFloat(SettingsActivity.SPEECHRATE, 1.0f)
-        pitch = sharedPreferences.getFloat(SettingsActivity.PITCH, 1.0f)
+        speechRate = sharedPreferences.getFloat(SettingsActivity.SPEECHRATE, SettingsActivity.DEFAULT_SPEECHRATE)
+        pitch = sharedPreferences.getFloat(SettingsActivity.PITCH, SettingsActivity.DEFAULT_PITCH)
     }
 
 
@@ -67,13 +75,27 @@ class ReadingScreenActivity : AppCompatActivity() {
             var i = startingIndex
             while (i < checkPoints.size-1 && !isPaused) {
                 currentSentence = i
+
                 tts.speak(textBody.substring(checkPoints[i], checkPoints[i+1]), TextToSpeech.QUEUE_ADD, null, null)
                 Log.i("Current sentence", currentSentence.toString())
+                runOnUiThread {
+                    articleBody.setHighlightedText(textBody, checkPoints[i], checkPoints[i+1],
+                        ContextCompat.getColor(this@ReadingScreenActivity, selectPlayColor))
+                }
+
                 TimeUnit.SECONDS.sleep(1L)
                 @Suppress("ControlFlowWithEmptyBody")
                 while (tts.isSpeaking);
                 i++
+                if (i == checkPoints.size-1) {
+                    runOnUiThread {
+                        toggleVisibility(false)
+                        articleBody.text = textBody
+                    }
+                    currentSentence = 0
+                }
             }
+
         }
         thread.start()
 
@@ -98,15 +120,20 @@ class ReadingScreenActivity : AppCompatActivity() {
     private fun goNext() {
         if (currentSentence < checkPoints.size-1)
             currentSentence++
-        if (!isPaused)
+        if(isPaused)
+            articleBody.setHighlightedText(textBody, checkPoints[currentSentence], checkPoints[currentSentence+1],
+                ContextCompat.getColor(this@ReadingScreenActivity, selectPauseColor))
+        else
             pauseAndPlay()
-
     }
 
     private fun goPrev() {
         if(currentSentence > 0)
             currentSentence--
-        if (!isPaused)
+        if(isPaused)
+            articleBody.setHighlightedText(textBody, checkPoints[currentSentence], checkPoints[currentSentence+1],
+                ContextCompat.getColor(this@ReadingScreenActivity, selectPauseColor))
+        else
             pauseAndPlay()
     }
 
@@ -123,9 +150,17 @@ class ReadingScreenActivity : AppCompatActivity() {
 
     private fun displayArticle() {
         val intent = intent
-        val index = intent.getIntExtra(MainActivity.index, 0)
-        fileName = MainActivity.articleList[index].fileName
-        textBody = MainActivity.articleList[index].textBody
+        val index = intent.getIntExtra(MainActivity.POSITION, -1)
+        if (index == -1) {
+            loadRecentlyPlayedData()
+            val dbHandler = MainActivity.dbHandler
+            textBody = dbHandler.getArticleBody(fileName)
+        }
+        else {
+            fileName = MainActivity.articleList[index].fileName
+            textBody = MainActivity.articleList[index].textBody
+            currentSentence = 0
+        }
         checkPoints = ArrayList()
 
         val punctuations = charArrayOf('.', '?', '!')
@@ -173,7 +208,10 @@ class ReadingScreenActivity : AppCompatActivity() {
                                 high = mid
                         }
                         currentSentence = low-1
-                        if(!isPaused)
+                        if(isPaused)
+                            articleBody.setHighlightedText(textBody, checkPoints[low-1], checkPoints[low],
+                                ContextCompat.getColor(this@ReadingScreenActivity, selectPauseColor))
+                        else
                             pauseAndPlay()
 
                         Log.i("Selected sentence", textBody.substring(checkPoints[low-1], checkPoints[low]))
@@ -217,11 +255,30 @@ class ReadingScreenActivity : AppCompatActivity() {
         buttonPrev.setOnClickListener { goPrev() }
     }
 
+    private fun saveRecentlyPlayedData() {
+        val sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE)
+        val editor: SharedPreferences.Editor = sharedPreferences.edit()
+
+        editor.putString(ARTICLE_NAME, fileName)
+        editor.putInt(CURRENT_SENTENCE, currentSentence)
+
+        editor.apply()
+    }
+
+    private fun loadRecentlyPlayedData() {
+        val sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE)
+
+        //Jhamela hote pare ekhane
+        fileName = sharedPreferences.getString(ARTICLE_NAME, "Article Name")!!
+        currentSentence = sharedPreferences.getInt(CURRENT_SENTENCE, 0)
+    }
+
     override fun onDestroy() {
+        super.onDestroy()
         isPaused = true
         tts.stop()
         tts.shutdown()
-        super.onDestroy()
+        saveRecentlyPlayedData()
     }
 
 }
