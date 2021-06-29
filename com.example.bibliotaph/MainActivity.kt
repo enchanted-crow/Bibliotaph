@@ -13,58 +13,57 @@ import androidx.activity.result.contract.ActivityResultContracts.StartActivityFo
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.bibliotaph.adapters.CustomAdapter
+import com.example.bibliotaph.adapters.MyAdapter
 import com.example.bibliotaph.models.Article
 import com.example.bibliotaph.models.CardModel
+import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 
-class MainActivity : AppCompatActivity(), CustomAdapter.OnCardListener {
+class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
 //    <Jawad>
 
-//    view-related variables
+    //    view-related variables
     private lateinit var recyclerView: RecyclerView
     private lateinit var addButton : FloatingActionButton
     private lateinit var addPDFButton : FloatingActionButton
     private lateinit var addArticleButton : FloatingActionButton
 
     private val rotateOpen : Animation by lazy { AnimationUtils.loadAnimation(
-        this,
-        R.anim.rotate_open_anim
+            this,
+            R.anim.rotate_open_anim
     )}
     private val rotateClose : Animation by lazy { AnimationUtils.loadAnimation(
-        this,
-        R.anim.rotate_close_anim
+            this,
+            R.anim.rotate_close_anim
     )}
     private val fromBottom : Animation by lazy { AnimationUtils.loadAnimation(
-        this,
-        R.anim.from_bottom_anim
+            this,
+            R.anim.from_bottom_anim
     )}
     private val toBottom : Animation by lazy { AnimationUtils.loadAnimation(
-        this,
-        R.anim.to_bottom_anim
+            this,
+            R.anim.to_bottom_anim
     )}
 
-//    state variables
+    //    state variables
     private var addButtonExpanded : Boolean = false
     private var toolbar : androidx.appcompat.widget.Toolbar? = null
+    private lateinit var bottomAppBar : BottomAppBar
 
-    private lateinit var myAdapter : CustomAdapter
+    private lateinit var myAdapter : MyAdapter
     private var linearLayoutManager : LinearLayoutManager? = null
 //    </Jawad>
 
 
-
-//    <Tahmid>
+    //    <Tahmid>
     companion object {
-        const val POSITION : String = "com.example.bibliotaph.INDEX"
-        lateinit var articleList : ArrayList<Article>
-        lateinit var dbHandler : DbHandler
+        @JvmStatic val index: String = "com.example.bibliotaph.INDEX"
+        @JvmStatic lateinit var articleList: ArrayList<Article>
     }
-   // private lateinit var dbHandler: DbHandler
+    private lateinit var dbHandler: DbHandler
     private var sortIndex: Int = 0
     private var cardList = java.util.ArrayList<CardModel>(1000)
     private var article2add: Article? = null
@@ -87,7 +86,7 @@ class MainActivity : AppCompatActivity(), CustomAdapter.OnCardListener {
 
     override fun onCardClick(position: Int) {
         val intent = Intent(this, ReadingScreenActivity::class.java)
-        intent.putExtra(POSITION, position)
+        intent.putExtra(index, position)
         startActivity(intent)
     }
 
@@ -103,7 +102,7 @@ class MainActivity : AppCompatActivity(), CustomAdapter.OnCardListener {
     private fun setupRecyclerView(layoutManager: RecyclerView.LayoutManager) {
         recyclerView = findViewById(R.id.recycler_view)
 
-        myAdapter = CustomAdapter(cardList, this)
+        myAdapter = MyAdapter(cardList, this)
         recyclerView.adapter = myAdapter
 
         recyclerView.layoutManager = layoutManager
@@ -116,6 +115,9 @@ class MainActivity : AppCompatActivity(), CustomAdapter.OnCardListener {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
+//            R.id.sort_by -> {
+//                Toast.makeText(this, "Sort By", Toast.LENGTH_SHORT).show()
+//            }
             R.id.settings -> {
                 Toast.makeText(this, "Settings", Toast.LENGTH_SHORT).show()
                 val intent = Intent(this@MainActivity, SettingsActivity::class.java)
@@ -146,6 +148,11 @@ class MainActivity : AppCompatActivity(), CustomAdapter.OnCardListener {
     private fun initToolbar() {
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
+
+        bottomAppBar = findViewById(R.id.bottomAppBar)
+        bottomAppBar.setOnClickListener {
+
+        }
     }
 
     private fun initAddButton() {
@@ -213,7 +220,7 @@ class MainActivity : AppCompatActivity(), CustomAdapter.OnCardListener {
     }
 
     private var pdfResultLauncher = registerForActivityResult(
-        StartActivityForResult()
+            StartActivityForResult()
     ) { result ->
         if (result.resultCode == RESULT_OK) {
             val data = result.data
@@ -241,7 +248,7 @@ class MainActivity : AppCompatActivity(), CustomAdapter.OnCardListener {
     }
 
     private var articleResultLauncher = registerForActivityResult(
-        StartActivityForResult()
+            StartActivityForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             val data: Intent? = result.data
