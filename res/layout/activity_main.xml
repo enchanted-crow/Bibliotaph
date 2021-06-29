@@ -7,8 +7,15 @@
     android:layout_height="match_parent"
     android:textAlignment="center">
 
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        app:srcCompat="@drawable/homescreen_bg" />
+
     <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appbar"
+        android:id="@+id/homescreen_appbar"
         android:layout_width="match_parent"
         android:layout_height="192dp"
         android:fitsSystemWindows="true"
@@ -18,25 +25,28 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
+            android:nestedScrollingEnabled="false"
+            app:collapsedTitleGravity="start"
             app:contentScrim="?attr/colorPrimary"
             app:expandedTitleGravity="top|left"
             app:expandedTitleTextAppearance="@style/TextAppearance.AppCompat.Display2"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:title="Bibliotaph"
-            app:toolbarId="@+id/homescreen_collapsing_toolbar">
-
-            <!--            <androidx.appcompat.widget.Toolbar-->
-            <!--                android:id="@+id/toolbar"-->
-            <!--                android:layout_width="match_parent"-->
-            <!--                android:layout_height="wrap_content"-->
-            <!--                android:layout_margin="8dp"-->
-            <!--                app:titleTextAppearance="@style/TextAppearance.AppCompat.Display1" />-->
+            app:layout_scrollFlags="scroll"
+            app:toolbarId="@+id/collapsing_toolbar">
 
             <androidx.appcompat.widget.Toolbar
-                android:id="@+id/homescreen_topbar"
+                android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                app:title="Bibliotaph" />
+                android:layout_gravity="bottom|top"
+                app:layout_collapseMode="pin"
+                app:title="@string/app_name" />
+
+            <!--            <ImageView-->
+            <!--                android:id="@+id/imageView1"-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:scaleType="center"-->
+            <!--                app:srcCompat="@drawable/whitebg" />-->
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
@@ -54,7 +64,7 @@
             tools:context=".MainActivity">
 
             <androidx.constraintlayout.widget.Barrier
-                android:id="@+id/barrier3"
+                android:id="@+id/reading_screen_top_barrier"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:barrierDirection="top" />
@@ -87,39 +97,22 @@
 
     </androidx.core.widget.NestedScrollView>
 
+    <com.google.android.material.bottomappbar.BottomAppBar
+        android:id="@+id/bottomAppBar"
+        style="@style/Widget.MaterialComponents.BottomAppBar.Colored"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        app:fabCradleMargin="8dp"
+        android:focusable="true"
+        android:clickable="true"
+        android:layout_gravity="bottom" >
+
+    </com.google.android.material.bottomappbar.BottomAppBar>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom">
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/materialCardView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:clickable="true"
-            android:focusable="true"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/gray" />
-
-            <TextView
-                android:id="@+id/recent_article_name"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginStart="32dp"
-                android:layout_marginTop="24dp"
-                android:layout_marginEnd="24dp"
-                android:layout_marginBottom="24dp"
-                android:text="Article Name"
-                android:textSize="20sp"
-                android:textStyle="bold" />
-        </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/add_pdf_button"
@@ -155,13 +148,30 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_marginEnd="24dp"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="80dp"
             android:contentDescription="@string/add_button"
             android:focusable="true"
             android:backgroundTint="@color/SpringGreen"
             android:src='@android:drawable/ic_input_add'
-            app:layout_constraintBottom_toTopOf="@+id/materialCardView"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_play_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:backgroundTint="@color/play_button_bgtint"
+            android:clickable="true"
+            android:contentDescription="@string/add_button"
+            android:focusable="true"
+            android:src='@drawable/ic_baseline_play_arrow_24'
+            app:borderWidth="0px"
+            app:elevation="0dp"
+            app:fabCustomSize="48dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:tint="@color/SpringGreen" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
