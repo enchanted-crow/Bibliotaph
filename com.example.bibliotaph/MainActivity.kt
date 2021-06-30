@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
@@ -53,6 +54,8 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
     private var addButtonExpanded : Boolean = false
     private var toolbar : androidx.appcompat.widget.Toolbar? = null
     private lateinit var bottomAppBar : BottomAppBar
+//    private lateinit var recentlyPlayedFileName : String
+//    private var recentlyPlayedCurrentSentence = 0
     private var recentlyPlayedFileName = "Article Name"
 
     private lateinit var myAdapter : MyAdapter
@@ -62,6 +65,8 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
 
     //    <Tahmid>
     companion object {
+//        const val POSITION : String = "com.example.bibliotaph.INDEX"
+//        lateinit var articleList : ArrayList<Article>
         const val TITLE : String = "com.example.bibliotaph.TITLE"
         const val SOURCE : String = "com.example.bibliotaph.SOURCE"
         const val PLAY : String = "com.example.bibliotaph.PLAY"
@@ -89,15 +94,13 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
         setupRecyclerView(linearLayoutManager!!)
     }
 
-    override fun onCardClick(position: Int) {
-        val intent = Intent(this, ReadingScreenActivity::class.java)
-        intent.putExtra(TITLE, cardList[position].fileName)
-        intent.putExtra(SOURCE, 1)
-        startActivity(intent)
-    }
-
     private fun createCardListFromDB() {
+//        articleList = dbHandler.getAllArticles(sortIndex)
         cardList.clear()
+//        for (article in articleList) {
+//            val card = CardModel(article.fileName, article.dateAdded)
+//            cardList.add(card)
+//        }
         cardList.addAll(dbHandler.getAllArticles(sortIndex))
 //        cardList = dbHandler.getAllArticles(sortIndex)
     }
@@ -215,8 +218,49 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
         }
     }
 
+    override fun onCardClick(position: Int) {
+        val intent = Intent(this, ReadingScreenActivity::class.java)
+//        intent.putExtra(POSITION, position)
+        intent.putExtra(TITLE, cardList[position].fileName)
+        intent.putExtra(SOURCE, 1)
+        startActivity(intent)
+    }
+
+    override fun onCardLongClick(position: Int, view : View?) {
+        showRvPopupMenu(position, view)
+//        Toast.makeText(this, "long click at $position", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun showRvPopupMenu(position: Int, view : View?) {
+        val popupMenu = PopupMenu(view?.context, view)
+        popupMenu.inflate((R.menu.rec_v_longclick_menu))
+
+        popupMenu.setOnMenuItemClickListener {
+            if (it != null) {
+                when(it.itemId) {
+                    R.id.delete -> {
+                        val fileName = cardList[position].fileName
+                        dbHandler.deleteArticle(fileName)
+                        cardList.removeAt(position)
+                        myAdapter.notifyDataSetChanged()
+                        Toast.makeText(this, "delete at $position", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+            return@setOnMenuItemClickListener false
+        }
+        popupMenu.show()
+    }
+
+    private fun loadRecentlyPlayedData() {
+        val sharedPreferences = getSharedPreferences(ReadingScreenActivity.SHARED_PREFS, MODE_PRIVATE)
+
+        recentlyPlayedFileName = sharedPreferences.getString(ReadingScreenActivity.ARTICLE_NAME, "Article Name")!!
+//        recentlyPlayedCurrentSentence = sharedPreferences.getInt(ReadingScreenActivity.CURRENT_SENTENCE, 0)
+    }
 
     // tahmid's methods
+
     private fun callChooseFileFromDevice() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
         intent.addCategory(Intent.CATEGORY_OPENABLE)
@@ -252,7 +296,6 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
                     }
                     loadingDialog.dismissDialog()
                 }.start()
-
             }
         }
     }
@@ -274,10 +317,5 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
                 myAdapter.notifyDataSetChanged()
             }
         }
-    }
-
-    private fun loadRecentlyPlayedData() {
-        val sharedPreferences = getSharedPreferences(ReadingScreenActivity.SHARED_PREFS, MODE_PRIVATE)
-        recentlyPlayedFileName = sharedPreferences.getString(ReadingScreenActivity.ARTICLE_NAME, "Article Name")!!
     }
 }
