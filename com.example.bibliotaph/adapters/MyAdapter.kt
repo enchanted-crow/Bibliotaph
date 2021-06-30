@@ -30,12 +30,13 @@ data class MyAdapter(
 		return cardList.size
 	}
 
-	inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
+	inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener, View.OnLongClickListener {
 		var articleName : TextView = itemView.findViewById(R.id.article_name)
 		var dateAdded : TextView = itemView.findViewById(R.id.date_added)
 
 		init {
-			itemView.setOnClickListener(this)
+			itemView.setOnClickListener (this)
+			itemView.setOnLongClickListener (this)
 
 			Log.d("recyclerview", ": holder init ")
 		}
@@ -44,12 +45,22 @@ data class MyAdapter(
 			if(adapterPosition != RecyclerView.NO_POSITION) {
 				onCardListener.onCardClick(adapterPosition)
 
-				Log.d("recyclerview", ": onclick  ")
+				Log.d("recyclerview", " onclick pos: $adapterPosition")
 			}
+		}
+
+		override fun onLongClick(v: View?): Boolean {
+			if(adapterPosition != RecyclerView.NO_POSITION) {
+				onCardListener.onCardLongClick(adapterPosition, v)
+
+				Log.d("recyclerview", " onlongclick pos: $adapterPosition")
+			}
+			return true
 		}
 	}
 
 	interface OnCardListener {
 		fun onCardClick (position: Int)
+		fun onCardLongClick (position: Int, view : View?)
 	}
 }
