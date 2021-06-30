@@ -7,7 +7,6 @@ import android.util.Log
 import android.widget.Button
 import android.widget.SeekBar
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import java.util.*
 import kotlin.math.roundToInt
@@ -22,25 +21,28 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var buttonPlay: Button
     private lateinit var tts : TextToSpeech
 
-    private var speechRate : Float = 1.0f
-    private var pitch : Float = 1.0f
-
     companion object {
-        const val SHARED_PREFS : String = "sharedPrefs"
-        const val SPEECHRATE : String = "speechRate"
-        const val PITCH : String = "pitch"
+        const val SHARED_PREFS : String = "com.example.bibliotaph.sharedPrefs"
+        const val SPEECHRATE : String = "com.example.bibliotaph.speechRate"
+        const val PITCH : String = "com.example.bibliotaph.pitch"
+        const val PAUSEAFTER : String = "com.example.bibliotaph.pauseAfter"
+
+        const val DEFAULT_SPEECHRATE : Float = 1.0f
+        const val DEFAULT_PITCH : Float = 1.0f
+        const val DEFAULT_PAUSE_AFTER : Int = 1
     }
+
+    private var speechRate : Float = DEFAULT_SPEECHRATE
+    private var pitch : Float = DEFAULT_PITCH
+    private var pauseAfter : Int = DEFAULT_PAUSE_AFTER
 
     private val speechRateStepSize = 0.25f
     private val minSpeechRate = 0.25f
-    private val maxSpeechRate = 3.00f
+    private val maxSpeechRate = 2.00f
 
     private val pitchStepSize = 0.25f
     private val minPitch = 0.25f
     private val maxPitch = 2.00f
-
-    private val defaultSpeechRate = 1.0f
-    private val defaultPitch = 1.0f
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,6 +58,8 @@ class SettingsActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         saveDate()
+        tts.stop()
+        tts.shutdown()
     }
 
     private fun initToolbar() {
@@ -65,8 +69,8 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun initSeekBars() {
-        tvValueSpeechRate = findViewById(R.id.tv_value_speech_rate)
-        var progressText: String = "%.2f x".format(speechRate)
+        tvValueSpeechRate = findViewById(R.id.value_speech_rate)
+        var progressText: String = "%.2fx".format(speechRate)
         tvValueSpeechRate.text = progressText
 
         seekbarSpeechRate = findViewById(R.id.seekBar_speech_rate)
@@ -79,15 +83,13 @@ class SettingsActivity : AppCompatActivity() {
 
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, b: Boolean) {
                 speechRate = minSpeechRate+(progress*speechRateStepSize)
-                progressText = "%.2f x".format(speechRate)
+                progressText = "%.2fx".format(speechRate)
                 tvValueSpeechRate.text = progressText
             }
 
-            override fun onStartTrackingTouch(seekBar: SeekBar) {
-            }
+            override fun onStartTrackingTouch(seekBar: SeekBar) {  }
 
-            override fun onStopTrackingTouch(seekBar: SeekBar) {
-            }
+            override fun onStopTrackingTouch(seekBar: SeekBar) {  }
         })
 
         seekbarPitch = findViewById(R.id.seekBar_pitch)
@@ -102,11 +104,9 @@ class SettingsActivity : AppCompatActivity() {
                 pitch = minPitch+(progress*pitchStepSize)
             }
 
-            override fun onStartTrackingTouch(seekBar: SeekBar) {
-            }
+            override fun onStartTrackingTouch(seekBar: SeekBar) {  }
 
-            override fun onStopTrackingTouch(seekBar: SeekBar) {
-            }
+            override fun onStopTrackingTouch(seekBar: SeekBar) {  }
         })
     }
 
@@ -114,17 +114,13 @@ class SettingsActivity : AppCompatActivity() {
         buttonReset = findViewById(R.id.settings_reset_btn)
 
         buttonReset.setOnClickListener {
-            val sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE)
+            speechRate = DEFAULT_SPEECHRATE
+            pitch = DEFAULT_PITCH
 
-            speechRate = defaultSpeechRate
-            pitch = defaultPitch
-
-            val progressText: String = "%.2f x".format(speechRate)
+            val progressText: String = "%.2fx".format(speechRate)
             tvValueSpeechRate.text = progressText
-            seekbarSpeechRate.progress = ((speechRate - minSpeechRate) / speechRateStepSize).toInt()
-
-            seekbarPitch.progress = ((pitch - minPitch) / pitchStepSize).toInt()
-            Toast.makeText(this, "reset", Toast.LENGTH_SHORT).show()
+            seekbarSpeechRate.progress = ((speechRate - minSpeechRate) / speechRateStepSize).roundToInt()
+            seekbarPitch.progress = ((pitch - minPitch) / pitchStepSize).roundToInt()
         }
     }
 
@@ -136,13 +132,11 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun speak() {
-        val text: String = "This is an example of speech synthesis in English."
+        val text = "The quick brown fox jumps over the lazy dog."
 
         tts.setSpeechRate(speechRate)
         tts.setPitch(pitch)
-        val succ = tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, null)
-
-        Toast.makeText(this, succ.toString(), Toast.LENGTH_SHORT).show()
+        tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, null)
     }
 
     private fun initTTS() {
@@ -150,7 +144,7 @@ class SettingsActivity : AppCompatActivity() {
             if (status == TextToSpeech.SUCCESS) {
                 val result: Int = tts.setLanguage(Locale.ENGLISH)
                 if (result == TextToSpeech.LANG_MISSING_DATA
-                        || result == TextToSpeech.LANG_NOT_SUPPORTED
+                    || result == TextToSpeech.LANG_NOT_SUPPORTED
                 ) {
                     Log.e("TTS", "Language not supported")
                 } else {
@@ -175,7 +169,7 @@ class SettingsActivity : AppCompatActivity() {
     private fun loadData() {
         val sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE)
 
-        speechRate = sharedPreferences.getFloat(SPEECHRATE, defaultSpeechRate)
-        pitch = sharedPreferences.getFloat(PITCH, defaultPitch)
+        speechRate = sharedPreferences.getFloat(SPEECHRATE, DEFAULT_SPEECHRATE)
+        pitch = sharedPreferences.getFloat(PITCH, DEFAULT_PITCH)
     }
 }
