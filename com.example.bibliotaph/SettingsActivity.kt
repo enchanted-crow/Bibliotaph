@@ -29,7 +29,7 @@ class SettingsActivity : AppCompatActivity() {
 
         const val DEFAULT_SPEECHRATE : Float = 1.0f
         const val DEFAULT_PITCH : Float = 1.0f
-        const val DEFAULT_PAUSE_AFTER : Int = 1
+        const val DEFAULT_PAUSE_AFTER : Int = 0
     }
 
     private var speechRate : Float = DEFAULT_SPEECHRATE
@@ -162,6 +162,7 @@ class SettingsActivity : AppCompatActivity() {
 
         editor.putFloat(SPEECHRATE, speechRate)
         editor.putFloat(PITCH, pitch)
+        editor.putInt(PAUSEAFTER, pauseAfter)
 
         editor.apply()
     }
@@ -171,5 +172,6 @@ class SettingsActivity : AppCompatActivity() {
 
         speechRate = sharedPreferences.getFloat(SPEECHRATE, DEFAULT_SPEECHRATE)
         pitch = sharedPreferences.getFloat(PITCH, DEFAULT_PITCH)
+        pauseAfter = sharedPreferences.getInt(PAUSEAFTER, DEFAULT_PAUSE_AFTER)
     }
 }
