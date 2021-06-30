@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 import com.example.bibliotaph.models.Article;
+import com.example.bibliotaph.models.CardModel;
 import com.example.bibliotaph.params.AppGlobals;
 import java.util.ArrayList;
 
@@ -37,35 +38,54 @@ public class DbHandler extends SQLiteOpenHelper {
         values.put(AppGlobals.KEY_BODY, article.getTextBody());
         values.put(AppGlobals.KEY_DATE, article.getDateAdded());
         db.insert(AppGlobals.TABLE_NAME, null, values);
-        Log.i("database", article.getTextBody());
     }
 
-    public ArrayList<Article> getAllArticles(int sortIndex) {
-        ArrayList<Article> articleList = new ArrayList<>();
+    public ArrayList<CardModel> getAllArticles(int sortIndex) {
+        ArrayList<CardModel> cardList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
         String select;
 
         if(sortIndex == 0) {
-            select = "Select * from " + AppGlobals.TABLE_NAME
+            select = "Select " + AppGlobals.KEY_NAME + ", " + AppGlobals.KEY_DATE
+                    + " from " + AppGlobals.TABLE_NAME
                     + " Order by " + AppGlobals.KEY_DATE + " Desc";
         }
         else {
-            select = "Select * from " + AppGlobals.TABLE_NAME
+            select = "Select " + AppGlobals.KEY_NAME + ", " + AppGlobals.KEY_DATE
+                    + " from " + AppGlobals.TABLE_NAME
                     + " Order by Upper(" + AppGlobals.KEY_NAME + ")" + " Asc";
         }
 
         Cursor cursor = db.rawQuery(select, null);
 
+        int articleNameIndex = cursor.getColumnIndex(AppGlobals.KEY_NAME);
+        int dateAddedIndex = cursor.getColumnIndex(AppGlobals.KEY_DATE);
+
         if(cursor.moveToFirst()) {
             do {
-                Article article = new Article();
-                article.setFileName(cursor.getString(0));
-                article.setTextBody(cursor.getString(1));
-                article.setDateAdded(cursor.getString(2));
-                articleList.add(article);
+                CardModel card = new CardModel();
+                card.setFileName(cursor.getString(articleNameIndex));
+                card.setDateAdded(cursor.getString(dateAddedIndex));
+                cardList.add(card);
             } while (cursor.moveToNext());
         }
         cursor.close();
-        return articleList;
+        return cardList;
+    }
+
+    public String getArticleBody(String articleName) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String select = "Select " + AppGlobals.KEY_BODY + " from " +
+                AppGlobals.TABLE_NAME + " where " + AppGlobals.KEY_NAME +
+                " = '" + articleName + "'";
+
+        Cursor cursor = db.rawQuery(select, null);
+        int textBodyIndex = cursor.getColumnIndex(AppGlobals.KEY_BODY);
+        String textBody = null;
+        if(cursor.moveToFirst()) {
+            textBody = cursor.getString(textBodyIndex);
+        }
+        cursor.close();
+        return textBody;
     }
 }
