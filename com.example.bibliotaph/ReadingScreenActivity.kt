@@ -53,10 +53,10 @@ class ReadingScreenActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_reading_screen)
         loadData()
-        displayArticle()
         initTTS()
         initButtons()
-
+        displayArticle()
+        initToolbar()
     }
 
     private fun loadData() {
@@ -77,7 +77,6 @@ class ReadingScreenActivity : AppCompatActivity() {
                 currentSentence = i
 
                 tts.speak(textBody.substring(checkPoints[i], checkPoints[i+1]), TextToSpeech.QUEUE_ADD, null, null)
-                Log.i("Current sentence", currentSentence.toString())
                 runOnUiThread {
                     articleBody.setHighlightedText(textBody, checkPoints[i], checkPoints[i+1],
                         ContextCompat.getColor(this@ReadingScreenActivity, selectPlayColor))
@@ -95,7 +94,6 @@ class ReadingScreenActivity : AppCompatActivity() {
                     currentSentence = 0
                 }
             }
-
         }
         thread.start()
 
@@ -103,7 +101,6 @@ class ReadingScreenActivity : AppCompatActivity() {
 
     private fun pause() {
         toggleVisibility(false)
-
         // do other pause stuff
         isPaused = true
         tts.stop()
@@ -148,36 +145,46 @@ class ReadingScreenActivity : AppCompatActivity() {
         }
     }
 
-    private fun displayArticle() {
-        val intent = intent
-        val index = intent.getIntExtra(MainActivity.POSITION, -1)
-        if (index == -1) {
-            loadRecentlyPlayedData()
-            val dbHandler = MainActivity.dbHandler
-            textBody = dbHandler.getArticleBody(fileName)
-        }
-        else {
-            fileName = MainActivity.articleList[index].fileName
-            textBody = MainActivity.articleList[index].textBody
-            currentSentence = 0
-        }
+    private fun markEndOfSentences() {
         checkPoints = ArrayList()
-
         val punctuations = charArrayOf('.', '?', '!')
         checkPoints.add(0)
         for (i in textBody.indices)
             for (punctuation in punctuations)
                 if (punctuation == textBody[i])
                     checkPoints.add(i+1)
+    }
 
-        toolbar = findViewById(R.id.reading_screen_top_toolbar)
-        toolbar.title = fileName
-        setSupportActionBar(toolbar)
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+    private fun displayArticle() {
+        val dbHandler = MainActivity.dbHandler
+        val intent = intent
+        val source = intent.getIntExtra(MainActivity.SOURCE, 0)
 
+        if (source == 0) {
+            loadRecentlyPlayedData()
+            Log.i("Current sentence", currentSentence.toString())
+
+            textBody = dbHandler.getArticleBody(fileName)
+            markEndOfSentences()
+            initText()
+            if(intent.getBooleanExtra(MainActivity.PLAY, false))
+                play()
+            else
+                articleBody.setHighlightedText(textBody, checkPoints[currentSentence], checkPoints[currentSentence+1],
+                    ContextCompat.getColor(this@ReadingScreenActivity, selectPauseColor))
+        }
+        else {
+            fileName = intent.getStringExtra(MainActivity.TITLE)!!
+            currentSentence = 0
+            textBody = dbHandler.getArticleBody(fileName)
+            markEndOfSentences()
+            initText()
+        }
+    }
+
+    private fun initText() {
         articleBody = findViewById(R.id.article_body)
         articleBody.text = textBody
-
         articleBody.setOnTouchListener(object : OnTouchListener {
             private val gestureDetector =
                 GestureDetector(this@ReadingScreenActivity, object : SimpleOnGestureListener() {
@@ -187,7 +194,6 @@ class ReadingScreenActivity : AppCompatActivity() {
                         return true
                     }
                 })
-
             override fun onTouch(v: View, event: MotionEvent): Boolean {
                 v.performClick()
                 if (gestureDetector.onTouchEvent(event)) {
@@ -213,15 +219,18 @@ class ReadingScreenActivity : AppCompatActivity() {
                                 ContextCompat.getColor(this@ReadingScreenActivity, selectPauseColor))
                         else
                             pauseAndPlay()
-
-                        Log.i("Selected sentence", textBody.substring(checkPoints[low-1], checkPoints[low]))
                     }
                 }
                 return true
             }
         })
+    }
 
-
+    private fun initToolbar() {
+        toolbar = findViewById(R.id.reading_screen_top_toolbar)
+        toolbar.title = fileName
+        setSupportActionBar(toolbar)
+        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
     }
 
     private fun initTTS() {
@@ -244,7 +253,7 @@ class ReadingScreenActivity : AppCompatActivity() {
     }
 
     private fun initButtons() {
-        buttonPlay = findViewById(R.id.fab_play_button)
+        buttonPlay = findViewById(R.id.play_recent_button)
         buttonPause = findViewById(R.id.fab_pause_button)
         buttonNext = findViewById(R.id.fab_next_button)
         buttonPrev = findViewById(R.id.fab_previous_button)
@@ -268,7 +277,6 @@ class ReadingScreenActivity : AppCompatActivity() {
     private fun loadRecentlyPlayedData() {
         val sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE)
 
-        //Jhamela hote pare ekhane
         fileName = sharedPreferences.getString(ARTICLE_NAME, "Article Name")!!
         currentSentence = sharedPreferences.getInt(CURRENT_SENTENCE, 0)
     }
@@ -280,5 +288,4 @@ class ReadingScreenActivity : AppCompatActivity() {
         tts.shutdown()
         saveRecentlyPlayedData()
     }
-
 }
