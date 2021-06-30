@@ -31,9 +31,14 @@ public class WebActivity extends AppCompatActivity {
                 title = title.substring(0, title.lastIndexOf("-")-1);
                 Element body = document.getElementById("mw-content-text");
                 Elements paragraphs = body.getElementsByTag("p");
-                for(Element paragraph: paragraphs)
-                    content.append(paragraph.text()).append("\n");
-                String articleBody = content.toString().replaceAll("\\[\\d*\\]","");
+                for(Element paragraph: paragraphs) {
+                    String p = paragraph.text();
+                    if (p.charAt(p.length()-1) != '.')
+                        p += '.';
+                    content.append(p).append("\n");
+                }
+
+                String articleBody = content.toString().replaceAll("\\[\\d*]","");
 
                 Intent intent = new Intent(WebActivity.this, MainActivity.class);
                 intent.putExtra(TITLE, title);
@@ -44,7 +49,6 @@ public class WebActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
             loadingDialog.dismissDialog();
-
         }).start();
     }
 
