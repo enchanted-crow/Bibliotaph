@@ -3,6 +3,7 @@ package com.example.bibliotaph
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -12,6 +13,7 @@ import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bibliotaph.adapters.MyAdapter
@@ -56,7 +58,8 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
     private lateinit var bottomAppBar : BottomAppBar
 //    private lateinit var recentlyPlayedFileName : String
 //    private var recentlyPlayedCurrentSentence = 0
-    private var recentlyPlayedFileName = "Article Name"
+    private val missingArticleFilename = "ARTICLE_MISSING"
+    private var recentlyPlayedFileName = missingArticleFilename
 
     private lateinit var myAdapter : MyAdapter
     private var linearLayoutManager : LinearLayoutManager? = null
@@ -86,23 +89,39 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
         dbHandler = DbHandler(this)
         createCardListFromDB()
 
-        initAddButton()
         initToolbar()
-        loadRecentlyPlayedData()
+        initAddButton()
+
+//        if(!dbHandler.findArticle(recentlyPlayedFileName)) {
+//            Log.d("MAIN", "not found")
+//            toggleBottomAppBar(false)
+//        }
+//        else toggleBottomAppBar(true)
+
+//        TODO
 
         linearLayoutManager = LinearLayoutManager(this)
         setupRecyclerView(linearLayoutManager!!)
     }
 
+    override fun onStart() {
+        super.onStart()
+        loadRecentlyPlayedData()
+
+        if(!dbHandler.findArticle(recentlyPlayedFileName)) {
+            toggleBottomAppBar(false)
+        }
+        else toggleBottomAppBar(true)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if(addButtonExpanded) onClickAddButton()
+    }
+
     private fun createCardListFromDB() {
-//        articleList = dbHandler.getAllArticles(sortIndex)
         cardList.clear()
-//        for (article in articleList) {
-//            val card = CardModel(article.fileName, article.dateAdded)
-//            cardList.add(card)
-//        }
         cardList.addAll(dbHandler.getAllArticles(sortIndex))
-//        cardList = dbHandler.getAllArticles(sortIndex)
     }
 
     private fun setupRecyclerView(layoutManager: RecyclerView.LayoutManager) {
@@ -153,7 +172,7 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
         setSupportActionBar(toolbar)
 
         bottomAppBar = findViewById(R.id.bottomAppBar)
-        bottomAppBar.title = recentlyPlayedFileName
+//        bottomAppBar.title = recentlyPlayedFileName
         bottomAppBar.setOnClickListener {
             val intent = Intent(this, ReadingScreenActivity::class.java)
             intent.putExtra(PLAY, false)
@@ -244,6 +263,10 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
                         cardList.removeAt(position)
                         myAdapter.notifyDataSetChanged()
                         Toast.makeText(this, "delete at $position", Toast.LENGTH_SHORT).show()
+
+                        if(!dbHandler.findArticle(recentlyPlayedFileName)) {
+                            toggleBottomAppBar(false)
+                        }
                     }
                 }
             }
@@ -252,11 +275,27 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
         popupMenu.show()
     }
 
+    private fun toggleBottomAppBar(toShow : Boolean) {
+        if(toShow) {
+            bottomAppBar.performShow()
+            playRecentButton.isVisible = true
+        }
+        else {
+//            if(bottomAppBar.visibility == View.VISIBLE) {
+                Log.d("MAIN", "will hide")
+                bottomAppBar.performHide()
+//            }
+//            val behavior = bottomAppBar.behavior as HideBottomViewOnScrollBehavior<*>
+//            behavior.slideDown(bottomAppBar) // use this to hide it
+//            behavior.slideUp(bottomAppBar) // use this to show it
+            playRecentButton.isVisible = false
+        }
+    }
+
     private fun loadRecentlyPlayedData() {
         val sharedPreferences = getSharedPreferences(ReadingScreenActivity.SHARED_PREFS, MODE_PRIVATE)
 
-        recentlyPlayedFileName = sharedPreferences.getString(ReadingScreenActivity.ARTICLE_NAME, "Article Name")!!
-//        recentlyPlayedCurrentSentence = sharedPreferences.getInt(ReadingScreenActivity.CURRENT_SENTENCE, 0)
+        recentlyPlayedFileName = sharedPreferences.getString(ReadingScreenActivity.ARTICLE_NAME, missingArticleFilename)!!
     }
 
     // tahmid's methods
