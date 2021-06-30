@@ -38,6 +38,7 @@ public class DbHandler extends SQLiteOpenHelper {
         values.put(AppGlobals.KEY_BODY, article.getTextBody());
         values.put(AppGlobals.KEY_DATE, article.getDateAdded());
         db.insert(AppGlobals.TABLE_NAME, null, values);
+        db.close();
     }
 
     public ArrayList<CardModel> getAllArticles(int sortIndex) {
@@ -70,6 +71,7 @@ public class DbHandler extends SQLiteOpenHelper {
             } while (cursor.moveToNext());
         }
         cursor.close();
+        db.close();
         return cardList;
     }
 
@@ -86,6 +88,13 @@ public class DbHandler extends SQLiteOpenHelper {
             textBody = cursor.getString(textBodyIndex);
         }
         cursor.close();
+        db.close();
         return textBody;
+    }
+
+    public void deleteArticle(String articleName) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(AppGlobals.TABLE_NAME, AppGlobals.KEY_NAME+"=?", new String[]{articleName});
+        db.close();
     }
 }
