@@ -30,6 +30,7 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
     private lateinit var addButton : FloatingActionButton
     private lateinit var addPDFButton : FloatingActionButton
     private lateinit var addArticleButton : FloatingActionButton
+    private lateinit var playRecentButton : FloatingActionButton
 
     private val rotateOpen : Animation by lazy { AnimationUtils.loadAnimation(
         this,
@@ -52,8 +53,7 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
     private var addButtonExpanded : Boolean = false
     private var toolbar : androidx.appcompat.widget.Toolbar? = null
     private lateinit var bottomAppBar : BottomAppBar
-    private lateinit var recentlyPlayedFileName : String
-    private var recentlyPlayedCurrentSentence = 0
+    private var recentlyPlayedFileName = "Article Name"
 
     private lateinit var myAdapter : MyAdapter
     private var linearLayoutManager : LinearLayoutManager? = null
@@ -62,8 +62,9 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
 
     //    <Tahmid>
     companion object {
-        const val POSITION : String = "com.example.bibliotaph.INDEX"
-        lateinit var articleList : ArrayList<Article>
+        const val TITLE : String = "com.example.bibliotaph.TITLE"
+        const val SOURCE : String = "com.example.bibliotaph.SOURCE"
+        const val PLAY : String = "com.example.bibliotaph.PLAY"
         lateinit var dbHandler : DbHandler
     }
 
@@ -90,17 +91,15 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
 
     override fun onCardClick(position: Int) {
         val intent = Intent(this, ReadingScreenActivity::class.java)
-        intent.putExtra(POSITION, position)
+        intent.putExtra(TITLE, cardList[position].fileName)
+        intent.putExtra(SOURCE, 1)
         startActivity(intent)
     }
 
     private fun createCardListFromDB() {
-        articleList = dbHandler.getAllArticles(sortIndex)
         cardList.clear()
-        for (article in articleList) {
-            val card = CardModel(article.fileName, article.dateAdded)
-            cardList.add(card)
-        }
+        cardList.addAll(dbHandler.getAllArticles(sortIndex))
+//        cardList = dbHandler.getAllArticles(sortIndex)
     }
 
     private fun setupRecyclerView(layoutManager: RecyclerView.LayoutManager) {
@@ -119,9 +118,6 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-//            R.id.sort_by -> {
-//                Toast.makeText(this, "Sort By", Toast.LENGTH_SHORT).show()
-//            }
             R.id.settings -> {
                 Toast.makeText(this, "Settings", Toast.LENGTH_SHORT).show()
                 val intent = Intent(this@MainActivity, SettingsActivity::class.java)
@@ -154,8 +150,10 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
         setSupportActionBar(toolbar)
 
         bottomAppBar = findViewById(R.id.bottomAppBar)
+        bottomAppBar.title = recentlyPlayedFileName
         bottomAppBar.setOnClickListener {
             val intent = Intent(this, ReadingScreenActivity::class.java)
+            intent.putExtra(PLAY, false)
             startActivity(intent)
         }
     }
@@ -177,6 +175,14 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
             Toast.makeText(this, "Article!", Toast.LENGTH_SHORT).show()
             callChooseArticleFromWeb()
         }
+
+        playRecentButton = findViewById(R.id.play_recent_button)
+        playRecentButton.setOnClickListener {
+            val intent = Intent(this, ReadingScreenActivity::class.java)
+            intent.putExtra(PLAY, true)
+            startActivity(intent)
+        }
+
     }
 
     private fun onClickAddButton() {
@@ -211,7 +217,6 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
 
 
     // tahmid's methods
-
     private fun callChooseFileFromDevice() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
         intent.addCategory(Intent.CATEGORY_OPENABLE)
@@ -273,8 +278,6 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
 
     private fun loadRecentlyPlayedData() {
         val sharedPreferences = getSharedPreferences(ReadingScreenActivity.SHARED_PREFS, MODE_PRIVATE)
-
         recentlyPlayedFileName = sharedPreferences.getString(ReadingScreenActivity.ARTICLE_NAME, "Article Name")!!
-        recentlyPlayedCurrentSentence = sharedPreferences.getInt(ReadingScreenActivity.CURRENT_SENTENCE, 0)
     }
 }
