@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="End of Sentence"
+        android:id="@+id/eo_sentence"/>
+
+    <item android:title="End of Paragraph"
+        android:id="@+id/eo_paragraph"/>
+
+    <item android:title="End of Article"
+        android:id="@+id/eo_article"/>
+</menu>
