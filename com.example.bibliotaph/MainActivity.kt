@@ -109,9 +109,9 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
         loadRecentlyPlayedData()
 
         if(!dbHandler.findArticle(recentlyPlayedFileName)) {
-            toggleBottomAppBar(false)
+            toggleBottomAppBar(false, false)
         }
-        else toggleBottomAppBar(true)
+        else toggleBottomAppBar(true, false)
     }
 
     override fun onPause() {
@@ -172,8 +172,8 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
         setSupportActionBar(toolbar)
 
         bottomAppBar = findViewById(R.id.bottomAppBar)
-//        bottomAppBar.title = recentlyPlayedFileName
         bottomAppBar.setOnClickListener {
+            Log.d("MAIN", "wanna go to $recentlyPlayedFileName")
             val intent = Intent(this, ReadingScreenActivity::class.java)
             intent.putExtra(PLAY, false)
             startActivity(intent)
@@ -265,7 +265,7 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
                         Toast.makeText(this, "delete at $position", Toast.LENGTH_SHORT).show()
 
                         if(!dbHandler.findArticle(recentlyPlayedFileName)) {
-                            toggleBottomAppBar(false)
+                            toggleBottomAppBar(false, true)
                         }
                     }
                 }
@@ -275,19 +275,19 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
         popupMenu.show()
     }
 
-    private fun toggleBottomAppBar(toShow : Boolean) {
+    private fun toggleBottomAppBar(toShow : Boolean, deleting : Boolean) {
         if(toShow) {
+            bottomAppBar.isVisible = true
             bottomAppBar.performShow()
+            bottomAppBar.isClickable = true
             playRecentButton.isVisible = true
         }
         else {
-//            if(bottomAppBar.visibility == View.VISIBLE) {
-                Log.d("MAIN", "will hide")
-                bottomAppBar.performHide()
-//            }
-//            val behavior = bottomAppBar.behavior as HideBottomViewOnScrollBehavior<*>
-//            behavior.slideDown(bottomAppBar) // use this to hide it
-//            behavior.slideUp(bottomAppBar) // use this to show it
+            bottomAppBar.performHide()
+            if(!deleting) {
+                bottomAppBar.isVisible = false
+                bottomAppBar.isClickable = false
+            }
             playRecentButton.isVisible = false
         }
     }
