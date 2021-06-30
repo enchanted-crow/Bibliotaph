@@ -93,8 +93,34 @@ class ReadingScreenActivity : AppCompatActivity() {
                 }
                 runOnUiThread { pause() }
             }
-            thread.start()
         }
+
+        else if (pauseAfter == 2) {
+            thread = Thread {
+                var i = startingIndex
+                while (i < checkPoints.size-1 && !isPaused) {
+                    currentSentence = i
+                    tts.speak(textBody.substring(checkPoints[i], checkPoints[i+1]), TextToSpeech.QUEUE_ADD, null, null)
+                    runOnUiThread {
+                        articleBody.setHighlightedText(textBody, checkPoints[i], checkPoints[i+1],
+                            ContextCompat.getColor(this@ReadingScreenActivity, selectPlayColor))
+                    }
+
+                    TimeUnit.SECONDS.sleep(1L)
+                    @Suppress("ControlFlowWithEmptyBody")
+                    while (tts.isSpeaking);
+                    i++
+                    if(textBody[checkPoints[i]] == '\n') {
+                        currentSentence = i
+                        break
+                    }
+                }
+                if (currentSentence+1 == checkPoints.size)
+                    currentSentence = 0
+                runOnUiThread { pause() }
+            }
+        }
+
         else {
             thread = Thread {
                 var i = startingIndex
@@ -120,10 +146,8 @@ class ReadingScreenActivity : AppCompatActivity() {
                     }
                 }
             }
-            thread.start()
         }
-
-
+        thread.start()
     }
 
     private fun pause() {
