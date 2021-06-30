@@ -42,6 +42,7 @@ class ReadingScreenActivity : AppCompatActivity() {
     //saved variables
     private var speechRate : Float = 1.0f
     private var pitch : Float = 1.0f
+    private var pauseAfter : Int = 0
 
     companion object {
         const val SHARED_PREFS : String = "com.example.bibliotaph.readingPrefs"
@@ -64,6 +65,7 @@ class ReadingScreenActivity : AppCompatActivity() {
 
         speechRate = sharedPreferences.getFloat(SettingsActivity.SPEECHRATE, SettingsActivity.DEFAULT_SPEECHRATE)
         pitch = sharedPreferences.getFloat(SettingsActivity.PITCH, SettingsActivity.DEFAULT_PITCH)
+        pauseAfter = sharedPreferences.getInt(SettingsActivity.PAUSEAFTER, SettingsActivity.DEFAULT_PAUSE_AFTER)
     }
 
 
@@ -71,10 +73,9 @@ class ReadingScreenActivity : AppCompatActivity() {
         toggleVisibility(true)
         isPaused = false
 
-        thread = Thread {
-            var i = startingIndex
-            while (i < checkPoints.size-1 && !isPaused) {
-                currentSentence = i
+        if (pauseAfter == 1) {
+            thread = Thread {
+                val i = currentSentence
 
                 tts.speak(textBody.substring(checkPoints[i], checkPoints[i+1]), TextToSpeech.QUEUE_ADD, null, null)
                 runOnUiThread {
@@ -85,17 +86,43 @@ class ReadingScreenActivity : AppCompatActivity() {
                 TimeUnit.SECONDS.sleep(1L)
                 @Suppress("ControlFlowWithEmptyBody")
                 while (tts.isSpeaking);
-                i++
+                currentSentence++
                 if (i == checkPoints.size-1) {
-                    runOnUiThread {
-                        toggleVisibility(false)
-                        articleBody.text = textBody
-                    }
+                    runOnUiThread { articleBody.text = textBody }
                     currentSentence = 0
                 }
+                runOnUiThread { pause() }
             }
+            thread.start()
         }
-        thread.start()
+        else {
+            thread = Thread {
+                var i = startingIndex
+                while (i < checkPoints.size-1 && !isPaused) {
+                    currentSentence = i
+
+                    tts.speak(textBody.substring(checkPoints[i], checkPoints[i+1]), TextToSpeech.QUEUE_ADD, null, null)
+                    runOnUiThread {
+                        articleBody.setHighlightedText(textBody, checkPoints[i], checkPoints[i+1],
+                            ContextCompat.getColor(this@ReadingScreenActivity, selectPlayColor))
+                    }
+
+                    TimeUnit.SECONDS.sleep(1L)
+                    @Suppress("ControlFlowWithEmptyBody")
+                    while (tts.isSpeaking);
+                    i++
+                    if (i == checkPoints.size-1) {
+                        runOnUiThread {
+                            toggleVisibility(false)
+                            articleBody.text = textBody
+                        }
+                        currentSentence = 0
+                    }
+                }
+            }
+            thread.start()
+        }
+
 
     }
 
@@ -104,6 +131,8 @@ class ReadingScreenActivity : AppCompatActivity() {
         // do other pause stuff
         isPaused = true
         tts.stop()
+        articleBody.setHighlightedText(textBody, checkPoints[currentSentence], checkPoints[currentSentence+1],
+            ContextCompat.getColor(this@ReadingScreenActivity, selectPauseColor))
     }
 
     private fun pauseAndPlay() {
