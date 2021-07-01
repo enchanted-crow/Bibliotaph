@@ -82,7 +82,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:layout_marginTop="12dp"
+                        android:layout_marginTop="16dp"
                         android:layout_marginEnd="16dp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -98,12 +98,12 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="@+id/textView_speech_rate" />
 
-                    <TextView
+                    <com.example.bibliotaph.textViews.CustomTextView
                         android:id="@+id/textView_pitch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginTop="12dp"
                         android:text="@string/pitch"
                         android:textSize="18sp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -136,7 +136,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:layout_marginTop="12dp"
+                        android:layout_marginTop="16dp"
                         android:layout_marginEnd="16dp"
                         android:progress="50"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -148,10 +148,11 @@
                         android:id="@+id/linearLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
                         android:layout_marginTop="16dp"
+                        android:layout_marginStart="16dp"
                         android:layout_marginEnd="16dp"
-                        app:layout_constraintTop_toBottomOf="@+id/seekBar_pitch">
+                        app:layout_constraintTop_toBottomOf="@+id/seekBar_pitch"
+                        tools:layout_editor_absoluteX="16dp">
 
                         <Button
                             android:id="@+id/settings_play_btn"
