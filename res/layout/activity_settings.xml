@@ -120,6 +120,17 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="@+id/fontsize_decrease" />
 
+                    <TextView
+                        android:id="@+id/font2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:text="Font Alignment"
+                        android:textSize="18sp"
+                        app:layout_constraintBottom_toBottomOf="@+id/align_justify"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@+id/align_justify" />
+
                     <SeekBar
                         android:id="@+id/seekBar_pitch"
                         android:layout_width="match_parent"
@@ -307,8 +318,8 @@
                         android:layout_marginStart="16dp"
                         android:layout_marginTop="16dp"
                         android:layout_marginEnd="16dp"
+                        android:text="@string/sample_text"
                         android:textSize="18sp"
-                        android:text="Sample Text"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/text" />
@@ -317,21 +328,61 @@
                         android:id="@+id/fontsize_decrease"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
                         android:layout_marginEnd="16dp"
                         app:layout_constraintEnd_toStartOf="@+id/fontsize_increase"
-                        app:layout_constraintTop_toBottomOf="@+id/sample_text"
-                        app:srcCompat="@drawable/ic_baseline_font_download_24" />
+                        app:layout_constraintTop_toTopOf="@id/fontsize_increase"
+                        app:layout_constraintBottom_toBottomOf="@id/fontsize_increase"
+                        app:srcCompat="@drawable/ic_reduce_font_size" />
+
+                    <ImageButton
+                        android:id="@+id/align_left"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="4dp"
+                        app:layout_constraintBottom_toBottomOf="@+id/align_justify"
+                        app:layout_constraintEnd_toStartOf="@+id/align_center"
+                        app:layout_constraintTop_toTopOf="@+id/align_justify"
+                        app:srcCompat="@drawable/ic_baseline_format_align_left_24" />
+
+                    <ImageButton
+                        android:id="@+id/align_right"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="4dp"
+                        app:layout_constraintBottom_toBottomOf="@+id/align_justify"
+                        app:layout_constraintEnd_toStartOf="@+id/align_justify"
+                        app:layout_constraintTop_toTopOf="@+id/align_justify"
+                        app:srcCompat="@drawable/ic_baseline_format_align_right_24" />
+
+                    <ImageButton
+                        android:id="@+id/align_center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="4dp"
+                        app:layout_constraintBottom_toBottomOf="@+id/align_justify"
+                        app:layout_constraintEnd_toStartOf="@+id/align_right"
+                        app:layout_constraintTop_toTopOf="@+id/align_justify"
+                        app:srcCompat="@drawable/ic_baseline_format_align_center_24" />
+
+                    <ImageButton
+                        android:id="@+id/align_justify"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginEnd="16dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/fontsize_increase"
+                        app:srcCompat="@drawable/ic_baseline_format_align_justify_24" />
 
                     <ImageButton
                         android:id="@+id/fontsize_increase"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="16dp"
-                        app:layout_constraintBottom_toBottomOf="@+id/fontsize_decrease"
+                        android:layout_marginTop="16dp"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="@+id/fontsize_decrease"
-                        app:srcCompat="@drawable/ic_baseline_font_download_24" />
+                        app:layout_constraintTop_toBottomOf="@+id/sample_text"
+                        app:srcCompat="@drawable/ic_increase_font_size" />
 
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
