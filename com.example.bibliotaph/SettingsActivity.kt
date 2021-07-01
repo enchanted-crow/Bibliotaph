@@ -1,15 +1,20 @@
 package com.example.bibliotaph
 
 import android.content.SharedPreferences
+import android.os.Build
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
+import android.text.Layout.JUSTIFICATION_MODE_INTER_WORD
 import android.util.Log
 import android.util.TypedValue
+import android.view.Gravity
 import android.view.View
 import android.widget.*
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import java.util.*
 import kotlin.math.roundToInt
+
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -24,6 +29,10 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var imageButtonFontDecrease : ImageButton
     private lateinit var imageButtonFontIncrease : ImageButton
     private lateinit var tvSampleText : TextView
+    private lateinit var imageButtonLeftAlign : ImageButton
+    private lateinit var imageButtonCenterAlign : ImageButton
+    private lateinit var imageButtonRightAlign : ImageButton
+    private lateinit var imageButtonJustifyAlign : ImageButton
 
     companion object {
         const val SHARED_PREFS : String = "com.example.bibliotaph.sharedPrefs"
@@ -64,6 +73,7 @@ class SettingsActivity : AppCompatActivity() {
         initPlayButton()
         initSpinners()
         initText()
+        initAlignment()
     }
 
     override fun onDestroy() {
@@ -71,6 +81,33 @@ class SettingsActivity : AppCompatActivity() {
         saveDate()
         tts.stop()
         tts.shutdown()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun initAlignment() {
+        imageButtonLeftAlign = findViewById(R.id.align_left)
+        imageButtonCenterAlign = findViewById(R.id.align_center)
+        imageButtonRightAlign = findViewById(R.id.align_right)
+        imageButtonJustifyAlign = findViewById(R.id.align_justify)
+
+        Log.d("Settings", Gravity.START.toString())
+        Log.d("Settings", Gravity.END.toString())
+        Log.d("Settings", Gravity.CENTER.toString())
+        Log.d("Settings", Gravity.START.toString())
+
+        imageButtonLeftAlign.setOnClickListener {
+            tvSampleText.gravity = Gravity.START
+        }
+        imageButtonRightAlign.setOnClickListener {
+            tvSampleText.gravity = Gravity.END
+        }
+        imageButtonCenterAlign.setOnClickListener {
+            tvSampleText.gravity = Gravity.CENTER
+        }
+        imageButtonJustifyAlign.setOnClickListener {
+            tvSampleText.gravity = Gravity.CENTER_VERTICAL or Gravity.START
+            tvSampleText.justificationMode = JUSTIFICATION_MODE_INTER_WORD
+        }
     }
 
     private fun initText() {
@@ -117,14 +154,14 @@ class SettingsActivity : AppCompatActivity() {
         seekbarSpeechRate.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
 
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, b: Boolean) {
-                speechRate = minSpeechRate+(progress*speechRateStepSize)
+                speechRate = minSpeechRate + (progress * speechRateStepSize)
                 progressText = "%.2fx".format(speechRate)
                 tvValueSpeechRate.text = progressText
             }
 
-            override fun onStartTrackingTouch(seekBar: SeekBar) {  }
+            override fun onStartTrackingTouch(seekBar: SeekBar) {}
 
-            override fun onStopTrackingTouch(seekBar: SeekBar) {  }
+            override fun onStopTrackingTouch(seekBar: SeekBar) {}
         })
 
         seekbarPitch = findViewById(R.id.seekBar_pitch)
@@ -136,12 +173,12 @@ class SettingsActivity : AppCompatActivity() {
         seekbarPitch.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
 
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, b: Boolean) {
-                pitch = minPitch+(progress*pitchStepSize)
+                pitch = minPitch + (progress * pitchStepSize)
             }
 
-            override fun onStartTrackingTouch(seekBar: SeekBar) {  }
+            override fun onStartTrackingTouch(seekBar: SeekBar) {}
 
-            override fun onStopTrackingTouch(seekBar: SeekBar) {  }
+            override fun onStopTrackingTouch(seekBar: SeekBar) {}
         })
     }
 
@@ -179,7 +216,7 @@ class SettingsActivity : AppCompatActivity() {
             if (status == TextToSpeech.SUCCESS) {
                 val result: Int = tts.setLanguage(Locale.ENGLISH)
                 if (result == TextToSpeech.LANG_MISSING_DATA
-                    || result == TextToSpeech.LANG_NOT_SUPPORTED
+                        || result == TextToSpeech.LANG_NOT_SUPPORTED
                 ) {
                     Log.e("TTS", "Language not supported")
                 } else {
