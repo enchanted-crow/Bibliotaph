@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.util.Log
+import android.util.TypedValue
 import android.view.GestureDetector
 import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.MotionEvent
@@ -43,6 +44,7 @@ class ReadingScreenActivity : AppCompatActivity() {
     private var speechRate : Float = 1.0f
     private var pitch : Float = 1.0f
     private var pauseAfter : Int = 0
+    private var fontSize : Float = 1.0f
 
     companion object {
         const val SHARED_PREFS : String = "com.example.bibliotaph.readingPrefs"
@@ -66,6 +68,7 @@ class ReadingScreenActivity : AppCompatActivity() {
         speechRate = sharedPreferences.getFloat(SettingsActivity.SPEECHRATE, SettingsActivity.DEFAULT_SPEECHRATE)
         pitch = sharedPreferences.getFloat(SettingsActivity.PITCH, SettingsActivity.DEFAULT_PITCH)
         pauseAfter = sharedPreferences.getInt(SettingsActivity.PAUSEAFTER, SettingsActivity.DEFAULT_PAUSE_AFTER)
+        fontSize = sharedPreferences.getFloat(SettingsActivity.FONTSIZE, SettingsActivity.DEFAULT_FONT_SIZE)
     }
 
 
@@ -248,6 +251,8 @@ class ReadingScreenActivity : AppCompatActivity() {
 
     private fun initText() {
         articleBody = findViewById(R.id.article_body)
+        fontSize /= resources.displayMetrics.scaledDensity
+        articleBody.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize)
         articleBody.text = textBody
         articleBody.setOnTouchListener(object : OnTouchListener {
             private val gestureDetector =
