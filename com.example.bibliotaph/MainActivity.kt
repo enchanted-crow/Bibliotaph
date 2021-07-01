@@ -10,6 +10,7 @@ import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.PopupMenu
+import android.widget.SearchView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
@@ -19,10 +20,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.bibliotaph.adapters.MyAdapter
 import com.example.bibliotaph.models.Article
 import com.example.bibliotaph.models.CardModel
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
@@ -36,40 +39,39 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
     private lateinit var playRecentButton : FloatingActionButton
 
     private val rotateOpen : Animation by lazy { AnimationUtils.loadAnimation(
-        this,
-        R.anim.rotate_open_anim
+            this,
+            R.anim.rotate_open_anim
     )}
     private val rotateClose : Animation by lazy { AnimationUtils.loadAnimation(
-        this,
-        R.anim.rotate_close_anim
+            this,
+            R.anim.rotate_close_anim
     )}
     private val fromBottom : Animation by lazy { AnimationUtils.loadAnimation(
-        this,
-        R.anim.from_bottom_anim
+            this,
+            R.anim.from_bottom_anim
     )}
     private val toBottom : Animation by lazy { AnimationUtils.loadAnimation(
-        this,
-        R.anim.to_bottom_anim
+            this,
+            R.anim.to_bottom_anim
     )}
 
     //    state variables
     private var addButtonExpanded : Boolean = false
     private var toolbar : androidx.appcompat.widget.Toolbar? = null
     private lateinit var bottomAppBar : BottomAppBar
-//    private lateinit var recentlyPlayedFileName : String
-//    private var recentlyPlayedCurrentSentence = 0
     private val missingArticleFilename = "ARTICLE_MISSING"
     private var recentlyPlayedFileName = missingArticleFilename
+    private lateinit var topAppBarLayout : AppBarLayout
 
     private lateinit var myAdapter : MyAdapter
+    private var cardList = ArrayList<CardModel>(1000)
+    private var displayList = ArrayList<CardModel>(1000)
     private var linearLayoutManager : LinearLayoutManager? = null
 //    </Jawad>
 
 
     //    <Tahmid>
     companion object {
-//        const val POSITION : String = "com.example.bibliotaph.INDEX"
-//        lateinit var articleList : ArrayList<Article>
         const val TITLE : String = "com.example.bibliotaph.TITLE"
         const val SOURCE : String = "com.example.bibliotaph.SOURCE"
         const val PLAY : String = "com.example.bibliotaph.PLAY"
@@ -77,7 +79,6 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
     }
 
     private var sortIndex: Int = 0
-    private var cardList = ArrayList<CardModel>(1000)
     private var article2add: Article? = null
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
 //    </Tahmid>
@@ -91,14 +92,6 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
 
         initToolbar()
         initAddButton()
-
-//        if(!dbHandler.findArticle(recentlyPlayedFileName)) {
-//            Log.d("MAIN", "not found")
-//            toggleBottomAppBar(false)
-//        }
-//        else toggleBottomAppBar(true)
-
-//        TODO
 
         linearLayoutManager = LinearLayoutManager(this)
         setupRecyclerView(linearLayoutManager!!)
@@ -122,12 +115,15 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
     private fun createCardListFromDB() {
         cardList.clear()
         cardList.addAll(dbHandler.getAllArticles(sortIndex))
+
+        displayList.clear()
+        displayList.addAll(cardList)
     }
 
     private fun setupRecyclerView(layoutManager: RecyclerView.LayoutManager) {
         recyclerView = findViewById(R.id.recycler_view)
 
-        myAdapter = MyAdapter(cardList, this)
+        myAdapter = MyAdapter(displayList, this)
         recyclerView.adapter = myAdapter
 
         recyclerView.layoutManager = layoutManager
@@ -135,7 +131,48 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu, menu)
-        return true
+
+        val menuItem = menu!!.findItem(R.id.search)
+
+        if(menuItem != null) {
+            val searchView = menuItem.actionView as SearchView
+            searchView.maxWidth  = Integer.MAX_VALUE
+
+            searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String?): Boolean {
+                    return true
+                }
+
+                override fun onQueryTextChange(newText: String?): Boolean {
+                    topAppBarLayout.setExpanded(false)
+
+                    if (newText!!.isNotEmpty()) {
+                        displayList.clear()
+                        val search = newText.toLowerCase(Locale.getDefault())
+
+                        cardList.forEach {
+                            if (it.fileName.toLowerCase(Locale.getDefault()).contains(search)) {
+                                displayList.add(it)
+                            }
+                        }
+
+                        myAdapter.notifyDataSetChanged()
+                    } else {
+                        displayList.clear()
+                        displayList.addAll(cardList)
+                        myAdapter.notifyDataSetChanged()
+                    }
+
+                    return true
+                }
+            })
+
+            searchView.setOnSearchClickListener {
+                topAppBarLayout.setExpanded(false)
+            }
+        }
+
+        return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -149,6 +186,7 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
                 Toast.makeText(this, "About", Toast.LENGTH_SHORT).show()
             }
             R.id.search -> {
+//                topAppBarLayout.setExpanded(false)
                 Toast.makeText(this, "Search", Toast.LENGTH_SHORT).show()
             }
             R.id.sort_by_date -> {
@@ -170,6 +208,8 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
     private fun initToolbar() {
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
+
+        topAppBarLayout = findViewById(R.id.homescreen_appbar)
 
         bottomAppBar = findViewById(R.id.bottomAppBar)
         bottomAppBar.setOnClickListener {
@@ -245,12 +285,12 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
         startActivity(intent)
     }
 
-    override fun onCardLongClick(position: Int, view : View?) {
+    override fun onCardLongClick(position: Int, view: View?) {
         showRvPopupMenu(position, view)
 //        Toast.makeText(this, "long click at $position", Toast.LENGTH_SHORT).show()
     }
 
-    private fun showRvPopupMenu(position: Int, view : View?) {
+    private fun showRvPopupMenu(position: Int, view: View?) {
         val popupMenu = PopupMenu(view?.context, view)
         popupMenu.inflate((R.menu.rec_v_longclick_menu))
 
@@ -264,7 +304,7 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
                         myAdapter.notifyDataSetChanged()
                         Toast.makeText(this, "delete at $position", Toast.LENGTH_SHORT).show()
 
-                        if(!dbHandler.findArticle(recentlyPlayedFileName)) {
+                        if (!dbHandler.findArticle(recentlyPlayedFileName)) {
                             toggleBottomAppBar(false, true)
                         }
                     }
@@ -275,7 +315,7 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
         popupMenu.show()
     }
 
-    private fun toggleBottomAppBar(toShow : Boolean, deleting : Boolean) {
+    private fun toggleBottomAppBar(toShow: Boolean, deleting: Boolean) {
         if(toShow) {
             bottomAppBar.isVisible = true
             bottomAppBar.performShow()
@@ -313,7 +353,7 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
     }
 
     private var pdfResultLauncher = registerForActivityResult(
-        StartActivityForResult()
+            StartActivityForResult()
     ) { result ->
         if (result.resultCode == RESULT_OK) {
             val data = result.data
@@ -340,7 +380,7 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
     }
 
     private var articleResultLauncher = registerForActivityResult(
-        StartActivityForResult()
+            StartActivityForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             val data: Intent? = result.data
