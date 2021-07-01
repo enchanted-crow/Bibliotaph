@@ -9,10 +9,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
-import android.widget.PopupMenu
-import android.widget.SearchView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
@@ -41,20 +38,20 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
     private lateinit var tvRecentlyPlayedName : TextView
 
     private val rotateOpen : Animation by lazy { AnimationUtils.loadAnimation(
-            this,
-            R.anim.rotate_open_anim
+        this,
+        R.anim.rotate_open_anim
     )}
     private val rotateClose : Animation by lazy { AnimationUtils.loadAnimation(
-            this,
-            R.anim.rotate_close_anim
+        this,
+        R.anim.rotate_close_anim
     )}
     private val fromBottom : Animation by lazy { AnimationUtils.loadAnimation(
-            this,
-            R.anim.from_bottom_anim
+        this,
+        R.anim.from_bottom_anim
     )}
     private val toBottom : Animation by lazy { AnimationUtils.loadAnimation(
-            this,
-            R.anim.to_bottom_anim
+        this,
+        R.anim.to_bottom_anim
     )}
 
     //    state variables
@@ -145,7 +142,7 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
 
             searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String?): Boolean {
-                    return true
+                    return false
                 }
 
                 override fun onQueryTextChange(newText: String?): Boolean {
@@ -173,11 +170,28 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
             })
 
             searchView.setOnSearchClickListener {
+                toggleAddButtons(false)
                 topAppBarLayout.setExpanded(false)
+            }
+
+            searchView.setOnCloseListener {
+                toggleAddButtons(true)
+                topAppBarLayout.setExpanded(true)
+                return@setOnCloseListener false
             }
         }
 
         return super.onCreateOptionsMenu(menu)
+    }
+
+    private fun toggleAddButtons(toShow : Boolean) {
+        if(toShow) {
+            addButton.isVisible = true
+        }
+        else {
+            if(addButtonExpanded) onClickAddButton()
+            addButton.isVisible = false
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -188,6 +202,8 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
                 startActivity(intent)
             }
             R.id.about -> {
+                val intent = Intent(this, AboutActivity::class.java)
+                startActivity(intent)
                 Toast.makeText(this, "About", Toast.LENGTH_SHORT).show()
             }
             R.id.search -> {
@@ -211,7 +227,7 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
     }
 
     private fun initToolbar() {
-        toolbar = findViewById(R.id.toolbar)
+        toolbar = findViewById(R.id.about_toolbar)
         setSupportActionBar(toolbar)
 
         topAppBarLayout = findViewById(R.id.homescreen_appbar)
@@ -227,6 +243,7 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
 
     private fun initAddButton() {
         addButton = findViewById(R.id.add_pdf_nd_article_button)
+
         addButton.setOnClickListener {
             onClickAddButton()
         }
@@ -249,7 +266,6 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
             intent.putExtra(PLAY, true)
             startActivity(intent)
         }
-
     }
 
     private fun onClickAddButton() {
@@ -361,7 +377,7 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
     }
 
     private var pdfResultLauncher = registerForActivityResult(
-            StartActivityForResult()
+        StartActivityForResult()
     ) { result ->
         if (result.resultCode == RESULT_OK) {
             val data = result.data
@@ -388,7 +404,7 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
     }
 
     private var articleResultLauncher = registerForActivityResult(
-            StartActivityForResult()
+        StartActivityForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             val data: Intent? = result.data
