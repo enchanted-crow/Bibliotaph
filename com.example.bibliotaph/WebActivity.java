@@ -7,12 +7,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Button;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import java.io.IOException;
+import java.util.Objects;
 
 public class WebActivity extends AppCompatActivity {
 
@@ -33,7 +34,7 @@ public class WebActivity extends AppCompatActivity {
                 Elements paragraphs = body.getElementsByTag("p");
                 for(Element paragraph: paragraphs) {
                     String p = paragraph.text();
-                    if (p.charAt(p.length()-1) != '.')
+                    if (!p.equals("") && p.charAt(p.length()-1) != '.')
                         p += '.';
                     content.append(p).append("\n");
                 }
@@ -57,7 +58,7 @@ public class WebActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_web);
 
-        Button button = findViewById(R.id.button);
+        FloatingActionButton button = findViewById(R.id.button);
         button.setOnClickListener(v -> {
             String url = webView.getUrl();
             Log.i("url", url);
