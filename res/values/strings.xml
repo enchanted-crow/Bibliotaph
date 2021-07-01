@@ -59,7 +59,7 @@ Start Lesson 4</string>
     <string name="_1x">1x</string>
     <string name="end_of_article">End of Article</string>
     <string name="repeat_each_sentence">Repeat each sentence</string>
-    <string name="pauses_and_repeats">PAUSES AND REPEATS</string>
+    <string name="pauses">PAUSES</string>
     <string name="play">Play</string>
     <string name="reset">Reset</string>
     <string name="pause_after">Pause after</string>
@@ -71,4 +71,20 @@ Start Lesson 4</string>
     <string name="last_added">Last added</string>
     <string name="a_z">A-Z</string>
     <string name="loading">Loading…</string>
+    <string name="sample_text">The quick brown fox jumps over the lazy dog.</string>
+    <string name="title_activity_about">AboutActivity</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="about_intro">Welcome to <b>Bibliotaph</b>, an app where you can listen to PDFs and WikiPedia articles offline.
+        Brought to you by <i>Tahmid Mahin</i> and <i>Jawad Habib</i>.
+        \n\nGithub: https://github.com/enchanted-crow/Bibliotaph
+        \n\nThank you for downloading! We hope you enjoy using our app as much we enjoyed making it.
+        \n\nThis app is a work in progress. Feel free to reach out to us for any suggestions or feedbacks.
+    </string>
 </resources>
