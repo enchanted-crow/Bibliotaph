@@ -4,9 +4,9 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.util.Log
-import android.widget.Button
-import android.widget.SeekBar
-import android.widget.TextView
+import android.util.TypedValue
+import android.view.View
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import java.util.*
 import kotlin.math.roundToInt
@@ -15,11 +15,15 @@ class SettingsActivity : AppCompatActivity() {
 
     private var toolbar : androidx.appcompat.widget.Toolbar? = null
     private lateinit var tvValueSpeechRate: TextView
+    private lateinit var spnPauseAfterSelected: Spinner
     private lateinit var seekbarSpeechRate: SeekBar
     private lateinit var seekbarPitch: SeekBar
     private lateinit var buttonReset: Button
     private lateinit var buttonPlay: Button
     private lateinit var tts : TextToSpeech
+    private lateinit var imageButtonFontDecrease : ImageButton
+    private lateinit var imageButtonFontIncrease : ImageButton
+    private lateinit var tvSampleText : TextView
 
     companion object {
         const val SHARED_PREFS : String = "com.example.bibliotaph.sharedPrefs"
@@ -29,7 +33,7 @@ class SettingsActivity : AppCompatActivity() {
 
         const val DEFAULT_SPEECHRATE : Float = 1.0f
         const val DEFAULT_PITCH : Float = 1.0f
-        const val DEFAULT_PAUSE_AFTER : Int = 0
+        const val DEFAULT_PAUSE_AFTER : Int = 2
     }
 
     private var speechRate : Float = DEFAULT_SPEECHRATE
@@ -44,6 +48,8 @@ class SettingsActivity : AppCompatActivity() {
     private val minPitch = 0.25f
     private val maxPitch = 2.00f
 
+    private var sampleTextSize = 18.0F
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
@@ -53,6 +59,8 @@ class SettingsActivity : AppCompatActivity() {
         initSeekBars()
         initResetButton()
         initPlayButton()
+        initSpinners()
+        initText()
     }
 
     override fun onDestroy() {
@@ -62,6 +70,27 @@ class SettingsActivity : AppCompatActivity() {
         tts.shutdown()
     }
 
+    private fun initText() {
+        imageButtonFontDecrease = findViewById(R.id.fontsize_decrease)
+        imageButtonFontIncrease = findViewById(R.id.fontsize_increase)
+        tvSampleText = findViewById(R.id.sample_text)
+
+        sampleTextSize = tvSampleText.textSize
+        sampleTextSize /= resources.displayMetrics.scaledDensity
+
+        imageButtonFontDecrease.setOnClickListener {
+            sampleTextSize -= 1
+            Log.d("FONT", sampleTextSize.toString())
+            tvSampleText.setTextSize(TypedValue.COMPLEX_UNIT_SP, sampleTextSize)
+        }
+
+        imageButtonFontIncrease.setOnClickListener {
+            sampleTextSize += 1
+            Log.d("FONT", sampleTextSize.toString())
+            tvSampleText.setTextSize(TypedValue.COMPLEX_UNIT_SP, sampleTextSize)
+        }
+    }
+
     private fun initToolbar() {
         toolbar = findViewById(R.id.settings_toolbar)
         setSupportActionBar(toolbar)
@@ -69,7 +98,7 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun initSeekBars() {
-        tvValueSpeechRate = findViewById(R.id.value_speech_rate)
+        tvValueSpeechRate = findViewById(R.id.tv_value_speech_rate)
         var progressText: String = "%.2fx".format(speechRate)
         tvValueSpeechRate.text = progressText
 
@@ -154,6 +183,30 @@ class SettingsActivity : AppCompatActivity() {
                 Log.e("TTS", "Initialization failed")
             }
         }
+    }
+
+    private fun initSpinners() {
+        spnPauseAfterSelected = findViewById(R.id.pause_after_selection)
+
+        val options = arrayOf("End of Sentence", "End of Paragraph", "End of Article")
+        spnPauseAfterSelected.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, options)
+        spnPauseAfterSelected.setSelection(pauseAfter)
+
+        spnPauseAfterSelected.onItemSelectedListener = object : AdapterView.OnItemClickListener, AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                Log.d("SETTINGS", "pause $position selected")
+                pauseAfter = position
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                Log.d("SETTINGS", "pause none selected")
+            }
+
+            override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                Log.d("SETTINGS", "pause $position click")
+            }
+        }
+
     }
 
     private fun saveDate() {
