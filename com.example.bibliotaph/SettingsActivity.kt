@@ -30,15 +30,18 @@ class SettingsActivity : AppCompatActivity() {
         const val SPEECHRATE : String = "com.example.bibliotaph.speechRate"
         const val PITCH : String = "com.example.bibliotaph.pitch"
         const val PAUSEAFTER : String = "com.example.bibliotaph.pauseAfter"
+        const val FONTSIZE : String = "com.example.bibliotaph.fontSize"
 
         const val DEFAULT_SPEECHRATE : Float = 1.0f
         const val DEFAULT_PITCH : Float = 1.0f
         const val DEFAULT_PAUSE_AFTER : Int = 2
+        const val DEFAULT_FONT_SIZE : Float = 18.0f
     }
 
     private var speechRate : Float = DEFAULT_SPEECHRATE
     private var pitch : Float = DEFAULT_PITCH
     private var pauseAfter : Int = DEFAULT_PAUSE_AFTER
+    private var fontSize : Float = DEFAULT_FONT_SIZE
 
     private val speechRateStepSize = 0.25f
     private val minSpeechRate = 0.25f
@@ -47,8 +50,8 @@ class SettingsActivity : AppCompatActivity() {
     private val pitchStepSize = 0.25f
     private val minPitch = 0.25f
     private val maxPitch = 2.00f
+    private val fontStepSize = 1.0f
 
-    private var sampleTextSize = 18.0F
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,19 +78,22 @@ class SettingsActivity : AppCompatActivity() {
         imageButtonFontIncrease = findViewById(R.id.fontsize_increase)
         tvSampleText = findViewById(R.id.sample_text)
 
-        sampleTextSize = tvSampleText.textSize
-        sampleTextSize /= resources.displayMetrics.scaledDensity
+        var tempSize = fontSize/resources.displayMetrics.scaledDensity
+
+        tvSampleText.setTextSize(TypedValue.COMPLEX_UNIT_SP, tempSize)
 
         imageButtonFontDecrease.setOnClickListener {
-            sampleTextSize -= 1
-            Log.d("FONT", sampleTextSize.toString())
-            tvSampleText.setTextSize(TypedValue.COMPLEX_UNIT_SP, sampleTextSize)
+            fontSize -= fontStepSize
+            tempSize = fontSize/resources.displayMetrics.scaledDensity
+            Log.d("FONT", fontSize.toString())
+            tvSampleText.setTextSize(TypedValue.COMPLEX_UNIT_SP, tempSize)
         }
 
         imageButtonFontIncrease.setOnClickListener {
-            sampleTextSize += 1
-            Log.d("FONT", sampleTextSize.toString())
-            tvSampleText.setTextSize(TypedValue.COMPLEX_UNIT_SP, sampleTextSize)
+            fontSize += fontStepSize
+            tempSize = fontSize/resources.displayMetrics.scaledDensity
+            Log.d("FONT", fontSize.toString())
+            tvSampleText.setTextSize(TypedValue.COMPLEX_UNIT_SP, tempSize)
         }
     }
 
@@ -194,12 +200,12 @@ class SettingsActivity : AppCompatActivity() {
 
         spnPauseAfterSelected.onItemSelectedListener = object : AdapterView.OnItemClickListener, AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                Log.d("SETTINGS", "pause $position selected")
                 pauseAfter = position
+                Log.d("SETTINGS", "pause $position select")
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                Log.d("SETTINGS", "pause none selected")
+                Log.d("SETTINGS", "pause none sec")
             }
 
             override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
@@ -216,6 +222,7 @@ class SettingsActivity : AppCompatActivity() {
         editor.putFloat(SPEECHRATE, speechRate)
         editor.putFloat(PITCH, pitch)
         editor.putInt(PAUSEAFTER, pauseAfter)
+        editor.putFloat(FONTSIZE, fontSize)
 
         editor.apply()
     }
@@ -226,5 +233,6 @@ class SettingsActivity : AppCompatActivity() {
         speechRate = sharedPreferences.getFloat(SPEECHRATE, DEFAULT_SPEECHRATE)
         pitch = sharedPreferences.getFloat(PITCH, DEFAULT_PITCH)
         pauseAfter = sharedPreferences.getInt(PAUSEAFTER, DEFAULT_PAUSE_AFTER)
+        fontSize = sharedPreferences.getFloat(FONTSIZE, DEFAULT_FONT_SIZE)
     }
 }
