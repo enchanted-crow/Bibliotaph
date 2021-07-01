@@ -114,7 +114,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:text="Text Size"
+                        android:text="Font Size"
                         android:textSize="18sp"
                         app:layout_constraintBottom_toBottomOf="@+id/fontsize_decrease"
                         app:layout_constraintStart_toStartOf="parent"
@@ -243,7 +243,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:layout_marginTop="24dp"
-                        android:text="@string/pauses_and_repeats"
+                        android:text="@string/pauses"
                         android:textSize="20sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
