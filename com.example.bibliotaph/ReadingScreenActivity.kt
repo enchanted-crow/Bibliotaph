@@ -73,11 +73,11 @@ class ReadingScreenActivity : AppCompatActivity() {
         toggleVisibility(true)
         isPaused = false
 
-        if (pauseAfter == 1) {
+        if (pauseAfter == 0) {
             thread = Thread {
-                val i = currentSentence
-
-                tts.speak(textBody.substring(checkPoints[i], checkPoints[i+1]), TextToSpeech.QUEUE_ADD, null, null)
+                var i = startingIndex
+                tts.speak(textBody.substring(checkPoints[i], checkPoints[i+1]),
+                    TextToSpeech.QUEUE_ADD, null, null)
                 runOnUiThread {
                     articleBody.setHighlightedText(textBody, checkPoints[i], checkPoints[i+1],
                         ContextCompat.getColor(this@ReadingScreenActivity, selectPlayColor))
@@ -86,16 +86,22 @@ class ReadingScreenActivity : AppCompatActivity() {
                 TimeUnit.SECONDS.sleep(1L)
                 @Suppress("ControlFlowWithEmptyBody")
                 while (tts.isSpeaking);
-                currentSentence++
+                i++
                 if (i == checkPoints.size-1) {
-                    runOnUiThread { articleBody.text = textBody }
+                    runOnUiThread {
+                        toggleVisibility(false)
+                        articleBody.text = textBody
+                    }
                     currentSentence = 0
                 }
-                runOnUiThread { pause() }
+                else if (!isPaused){
+                    currentSentence = i
+                    runOnUiThread { pause() }
+                }
             }
         }
 
-        else if (pauseAfter == 2) {
+        else if (pauseAfter == 1) {
             thread = Thread {
                 var i = startingIndex
                 while (i < checkPoints.size-1 && !isPaused) {
@@ -110,14 +116,19 @@ class ReadingScreenActivity : AppCompatActivity() {
                     @Suppress("ControlFlowWithEmptyBody")
                     while (tts.isSpeaking);
                     i++
-                    if(textBody[checkPoints[i]] == '\n') {
+                    if (i == checkPoints.size-1) {
+                        runOnUiThread {
+                            toggleVisibility(false)
+                            articleBody.text = textBody
+                        }
+                        currentSentence = 0
+                    }
+                    else if(textBody[checkPoints[i]] == '\n') {
                         currentSentence = i
+                        runOnUiThread { pause() }
                         break
                     }
                 }
-                if (currentSentence+1 == checkPoints.size)
-                    currentSentence = 0
-                runOnUiThread { pause() }
             }
         }
 
@@ -334,11 +345,15 @@ class ReadingScreenActivity : AppCompatActivity() {
         currentSentence = sharedPreferences.getInt(CURRENT_SENTENCE, 0)
     }
 
+    override fun onPause() {
+        super.onPause()
+        saveRecentlyPlayedData()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         isPaused = true
         tts.stop()
         tts.shutdown()
-        saveRecentlyPlayedData()
     }
 }
