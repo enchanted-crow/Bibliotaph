@@ -7,6 +7,7 @@ import android.util.Log
 import android.util.TypedValue
 import android.view.GestureDetector
 import android.view.GestureDetector.SimpleOnGestureListener
+import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
@@ -45,6 +46,7 @@ class ReadingScreenActivity : AppCompatActivity() {
     private var pitch : Float = 1.0f
     private var pauseAfter : Int = 0
     private var fontSize : Float = 1.0f
+    private var alignment : Int = Gravity.START
 
     companion object {
         const val SHARED_PREFS : String = "com.example.bibliotaph.readingPrefs"
@@ -69,6 +71,8 @@ class ReadingScreenActivity : AppCompatActivity() {
         pitch = sharedPreferences.getFloat(SettingsActivity.PITCH, SettingsActivity.DEFAULT_PITCH)
         pauseAfter = sharedPreferences.getInt(SettingsActivity.PAUSEAFTER, SettingsActivity.DEFAULT_PAUSE_AFTER)
         fontSize = sharedPreferences.getFloat(SettingsActivity.FONTSIZE, SettingsActivity.DEFAULT_FONT_SIZE)
+        alignment = sharedPreferences.getInt(SettingsActivity.ALIGNMENT, SettingsActivity.DEFAULT_ALIGNMENT)
+        Log.i("alignment", alignment.toString())
     }
 
 
@@ -251,8 +255,12 @@ class ReadingScreenActivity : AppCompatActivity() {
 
     private fun initText() {
         articleBody = findViewById(R.id.article_body)
+        articleBody.gravity = alignment
+
         fontSize /= resources.displayMetrics.scaledDensity
         articleBody.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize)
+
+
         articleBody.text = textBody
         articleBody.setOnTouchListener(object : OnTouchListener {
             private val gestureDetector =
