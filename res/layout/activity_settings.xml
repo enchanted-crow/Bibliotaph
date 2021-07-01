@@ -60,11 +60,11 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:layout_marginTop="16dp"
+                        android:layout_marginTop="24dp"
                         android:text="@string/speech"
                         android:textSize="20sp"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toBottomOf="@id/align_left" />
 
                     <TextView
                         android:id="@+id/textView_speech_rate"
@@ -121,15 +121,15 @@
                         app:layout_constraintTop_toTopOf="@+id/fontsize_decrease" />
 
                     <TextView
-                        android:id="@+id/font2"
+                        android:id="@+id/alignment"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:text="Font Alignment"
                         android:textSize="18sp"
-                        app:layout_constraintBottom_toBottomOf="@+id/align_justify"
+                        app:layout_constraintBottom_toBottomOf="@+id/align_right"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="@+id/align_justify" />
+                        app:layout_constraintTop_toTopOf="@+id/align_right" />
 
                     <SeekBar
                         android:id="@+id/seekBar_pitch"
@@ -172,27 +172,27 @@
                             android:text="@string/reset" />
                     </androidx.appcompat.widget.LinearLayoutCompat>
 
-                    <TextView
-                        android:id="@+id/voice"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginTop="24dp"
-                        android:text="@string/voice"
-                        android:textSize="20sp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/pause_after" />
+<!--                    <TextView-->
+<!--                        android:id="@+id/voice"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginStart="16dp"-->
+<!--                        android:layout_marginTop="24dp"-->
+<!--                        android:text="@string/voice"-->
+<!--                        android:textSize="20sp"-->
+<!--                        app:layout_constraintStart_toStartOf="parent"-->
+<!--                        app:layout_constraintTop_toBottomOf="@+id/pause_after" />-->
 
-                    <TextView
-                        android:id="@+id/textView_choose_voice"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginTop="24dp"
-                        android:text="@string/choose_voice"
-                        android:textSize="18sp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/voice" />
+<!--                    <TextView-->
+<!--                        android:id="@+id/textView_choose_voice"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginStart="16dp"-->
+<!--                        android:layout_marginTop="24dp"-->
+<!--                        android:text="@string/choose_voice"-->
+<!--                        android:textSize="18sp"-->
+<!--                        app:layout_constraintStart_toStartOf="parent"-->
+<!--                        app:layout_constraintTop_toBottomOf="@+id/voice" />-->
 
 
                     <androidx.constraintlayout.widget.Barrier
@@ -222,30 +222,30 @@
                         app:constraint_referenced_ids="tv_value_speech_rate,seekBar_speech_rate"
                         app:layout_constraintEnd_toEndOf="parent" />
 
-                    <TextView
-                        android:id="@+id/textView_selected_voice"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginEnd="16dp"
-                        android:text="@string/checked_Textview"
-                        android:textSize="18sp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.0"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/textView_choose_voice" />
+<!--                    <TextView-->
+<!--                        android:id="@+id/textView_selected_voice"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginStart="16dp"-->
+<!--                        android:layout_marginTop="16dp"-->
+<!--                        android:layout_marginEnd="16dp"-->
+<!--                        android:text="@string/checked_Textview"-->
+<!--                        android:textSize="18sp"-->
+<!--                        app:layout_constraintEnd_toEndOf="parent"-->
+<!--                        app:layout_constraintHorizontal_bias="0.0"-->
+<!--                        app:layout_constraintStart_toStartOf="parent"-->
+<!--                        app:layout_constraintTop_toBottomOf="@+id/textView_choose_voice" />-->
 
                     <TextView
                         android:id="@+id/pauses_and_repeats"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:layout_marginTop="300dp"
+                        android:layout_marginTop="24dp"
                         android:text="@string/pauses_and_repeats"
                         android:textSize="20sp"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/text" />
+                        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
                     <TextView
                         android:id="@+id/pause_after"
@@ -305,18 +305,18 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:layout_marginTop="24dp"
+                        android:layout_marginTop="16dp"
                         android:text="TEXT"
                         android:textSize="20sp"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+                        app:layout_constraintTop_toTopOf="parent" />
 
                     <com.example.bibliotaph.textViews.CustomTextView
                         android:id="@+id/sample_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:layout_marginTop="16dp"
+                        android:layout_marginTop="24dp"
                         android:layout_marginEnd="16dp"
                         android:text="@string/sample_text"
                         android:textSize="18sp"
@@ -339,19 +339,19 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="4dp"
-                        app:layout_constraintBottom_toBottomOf="@+id/align_justify"
+                        app:layout_constraintBottom_toBottomOf="@+id/align_right"
                         app:layout_constraintEnd_toStartOf="@+id/align_center"
-                        app:layout_constraintTop_toTopOf="@+id/align_justify"
+                        app:layout_constraintTop_toTopOf="@+id/align_right"
                         app:srcCompat="@drawable/ic_baseline_format_align_left_24" />
 
                     <ImageButton
                         android:id="@+id/align_right"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="4dp"
-                        app:layout_constraintBottom_toBottomOf="@+id/align_justify"
-                        app:layout_constraintEnd_toStartOf="@+id/align_justify"
-                        app:layout_constraintTop_toTopOf="@+id/align_justify"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginEnd="16dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/fontsize_increase"
                         app:srcCompat="@drawable/ic_baseline_format_align_right_24" />
 
                     <ImageButton
@@ -359,20 +359,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="4dp"
-                        app:layout_constraintBottom_toBottomOf="@+id/align_justify"
+                        app:layout_constraintBottom_toBottomOf="@+id/align_right"
                         app:layout_constraintEnd_toStartOf="@+id/align_right"
-                        app:layout_constraintTop_toTopOf="@+id/align_justify"
+                        app:layout_constraintTop_toTopOf="@+id/align_right"
                         app:srcCompat="@drawable/ic_baseline_format_align_center_24" />
-
-                    <ImageButton
-                        android:id="@+id/align_justify"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:layout_marginEnd="16dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/fontsize_increase"
-                        app:srcCompat="@drawable/ic_baseline_format_align_justify_24" />
 
                     <ImageButton
                         android:id="@+id/fontsize_increase"
