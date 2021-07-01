@@ -9,6 +9,12 @@ Organized by: Willie Tsang
     <!-- Android style -->
     <color name="android_green">#A4C639</color>
 
+    <color name="pure_black_or_white">@color/white</color>
+    <color name="rd_screen_selected_play">@color/holo_blue_dark</color>
+    <color name="rd_screen_selected_pause">@color/holo_blue_light</color>
+    <color name="text_color">#545452</color>
+
+
     <!-- Android Holo style -->
     <color name="holo_blue_bright">#ff00ddff</color>
     <color name="holo_blue_dark">#ff0099cc</color>
