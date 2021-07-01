@@ -11,6 +11,7 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.PopupMenu
 import android.widget.SearchView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
@@ -37,6 +38,7 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
     private lateinit var addPDFButton : FloatingActionButton
     private lateinit var addArticleButton : FloatingActionButton
     private lateinit var playRecentButton : FloatingActionButton
+    private lateinit var tvRecentlyPlayedName : TextView
 
     private val rotateOpen : Animation by lazy { AnimationUtils.loadAnimation(
             this,
@@ -100,6 +102,9 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
     override fun onStart() {
         super.onStart()
         loadRecentlyPlayedData()
+
+        tvRecentlyPlayedName = findViewById(R.id.recent_article)
+        tvRecentlyPlayedName.text = recentlyPlayedFileName
 
         if(!dbHandler.findArticle(recentlyPlayedFileName)) {
             toggleBottomAppBar(false, false)
@@ -301,6 +306,7 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
                         val fileName = cardList[position].fileName
                         dbHandler.deleteArticle(fileName)
                         cardList.removeAt(position)
+                        displayList.removeAt(position)
                         myAdapter.notifyDataSetChanged()
                         Toast.makeText(this, "delete at $position", Toast.LENGTH_SHORT).show()
 
@@ -321,6 +327,7 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
             bottomAppBar.performShow()
             bottomAppBar.isClickable = true
             playRecentButton.isVisible = true
+            tvRecentlyPlayedName.isVisible = true
         }
         else {
             bottomAppBar.performHide()
@@ -329,6 +336,7 @@ class MainActivity : AppCompatActivity(), MyAdapter.OnCardListener {
                 bottomAppBar.isClickable = false
             }
             playRecentButton.isVisible = false
+            tvRecentlyPlayedName.isVisible = false
         }
     }
 
