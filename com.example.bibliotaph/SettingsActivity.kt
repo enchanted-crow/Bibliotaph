@@ -4,7 +4,6 @@ import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
-import android.text.Layout.JUSTIFICATION_MODE_INTER_WORD
 import android.util.Log
 import android.util.TypedValue
 import android.view.Gravity
@@ -14,7 +13,6 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import java.util.*
 import kotlin.math.roundToInt
-
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -32,7 +30,6 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var imageButtonLeftAlign : ImageButton
     private lateinit var imageButtonCenterAlign : ImageButton
     private lateinit var imageButtonRightAlign : ImageButton
-    private lateinit var imageButtonJustifyAlign : ImageButton
 
     companion object {
         const val SHARED_PREFS : String = "com.example.bibliotaph.sharedPrefs"
@@ -40,17 +37,20 @@ class SettingsActivity : AppCompatActivity() {
         const val PITCH : String = "com.example.bibliotaph.pitch"
         const val PAUSEAFTER : String = "com.example.bibliotaph.pauseAfter"
         const val FONTSIZE : String = "com.example.bibliotaph.fontSize"
+        const val ALIGNMENT : String = "com.example.bibliotaph.alignment"
 
         const val DEFAULT_SPEECHRATE : Float = 1.0f
         const val DEFAULT_PITCH : Float = 1.0f
         const val DEFAULT_PAUSE_AFTER : Int = 2
         const val DEFAULT_FONT_SIZE : Float = 18.0f
+        const val DEFAULT_ALIGNMENT : Int = Gravity.START
     }
 
     private var speechRate : Float = DEFAULT_SPEECHRATE
     private var pitch : Float = DEFAULT_PITCH
     private var pauseAfter : Int = DEFAULT_PAUSE_AFTER
     private var fontSize : Float = DEFAULT_FONT_SIZE
+    private var alignment : Int = DEFAULT_ALIGNMENT
 
     private val speechRateStepSize = 0.25f
     private val minSpeechRate = 0.25f
@@ -59,6 +59,7 @@ class SettingsActivity : AppCompatActivity() {
     private val pitchStepSize = 0.25f
     private val minPitch = 0.25f
     private val maxPitch = 2.00f
+
     private val fontStepSize = 1.0f
 
 
@@ -88,25 +89,22 @@ class SettingsActivity : AppCompatActivity() {
         imageButtonLeftAlign = findViewById(R.id.align_left)
         imageButtonCenterAlign = findViewById(R.id.align_center)
         imageButtonRightAlign = findViewById(R.id.align_right)
-        imageButtonJustifyAlign = findViewById(R.id.align_justify)
 
         Log.d("Settings", Gravity.START.toString())
         Log.d("Settings", Gravity.END.toString())
         Log.d("Settings", Gravity.CENTER.toString())
-        Log.d("Settings", Gravity.START.toString())
 
         imageButtonLeftAlign.setOnClickListener {
-            tvSampleText.gravity = Gravity.START
+            alignment = Gravity.START
+            tvSampleText.gravity = alignment
         }
         imageButtonRightAlign.setOnClickListener {
-            tvSampleText.gravity = Gravity.END
+            alignment = Gravity.END
+            tvSampleText.gravity = alignment
         }
         imageButtonCenterAlign.setOnClickListener {
-            tvSampleText.gravity = Gravity.CENTER
-        }
-        imageButtonJustifyAlign.setOnClickListener {
-            tvSampleText.gravity = Gravity.CENTER_VERTICAL or Gravity.START
-            tvSampleText.justificationMode = JUSTIFICATION_MODE_INTER_WORD
+            alignment = Gravity.CENTER
+            tvSampleText.gravity = alignment
         }
     }
 
@@ -114,6 +112,7 @@ class SettingsActivity : AppCompatActivity() {
         imageButtonFontDecrease = findViewById(R.id.fontsize_decrease)
         imageButtonFontIncrease = findViewById(R.id.fontsize_increase)
         tvSampleText = findViewById(R.id.sample_text)
+        tvSampleText.gravity = alignment
 
         var tempSize = fontSize/resources.displayMetrics.scaledDensity
 
@@ -154,14 +153,14 @@ class SettingsActivity : AppCompatActivity() {
         seekbarSpeechRate.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
 
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, b: Boolean) {
-                speechRate = minSpeechRate + (progress * speechRateStepSize)
+                speechRate = minSpeechRate+(progress*speechRateStepSize)
                 progressText = "%.2fx".format(speechRate)
                 tvValueSpeechRate.text = progressText
             }
 
-            override fun onStartTrackingTouch(seekBar: SeekBar) {}
+            override fun onStartTrackingTouch(seekBar: SeekBar) {  }
 
-            override fun onStopTrackingTouch(seekBar: SeekBar) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar) {  }
         })
 
         seekbarPitch = findViewById(R.id.seekBar_pitch)
@@ -173,12 +172,12 @@ class SettingsActivity : AppCompatActivity() {
         seekbarPitch.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
 
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, b: Boolean) {
-                pitch = minPitch + (progress * pitchStepSize)
+                pitch = minPitch+(progress*pitchStepSize)
             }
 
-            override fun onStartTrackingTouch(seekBar: SeekBar) {}
+            override fun onStartTrackingTouch(seekBar: SeekBar) {  }
 
-            override fun onStopTrackingTouch(seekBar: SeekBar) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar) {  }
         })
     }
 
@@ -216,7 +215,7 @@ class SettingsActivity : AppCompatActivity() {
             if (status == TextToSpeech.SUCCESS) {
                 val result: Int = tts.setLanguage(Locale.ENGLISH)
                 if (result == TextToSpeech.LANG_MISSING_DATA
-                        || result == TextToSpeech.LANG_NOT_SUPPORTED
+                    || result == TextToSpeech.LANG_NOT_SUPPORTED
                 ) {
                     Log.e("TTS", "Language not supported")
                 } else {
@@ -260,6 +259,7 @@ class SettingsActivity : AppCompatActivity() {
         editor.putFloat(PITCH, pitch)
         editor.putInt(PAUSEAFTER, pauseAfter)
         editor.putFloat(FONTSIZE, fontSize)
+        editor.putInt(ALIGNMENT, alignment)
 
         editor.apply()
     }
@@ -271,5 +271,7 @@ class SettingsActivity : AppCompatActivity() {
         pitch = sharedPreferences.getFloat(PITCH, DEFAULT_PITCH)
         pauseAfter = sharedPreferences.getInt(PAUSEAFTER, DEFAULT_PAUSE_AFTER)
         fontSize = sharedPreferences.getFloat(FONTSIZE, DEFAULT_FONT_SIZE)
+        alignment = sharedPreferences.getInt(ALIGNMENT, DEFAULT_ALIGNMENT)
+        Log.i("align", alignment.toString())
     }
 }
