@@ -19,6 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="192dp"
         android:fitsSystemWindows="true"
+        android:backgroundTint="@color/pure_black_or_white"
         app:elevation="0dp">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
@@ -30,7 +31,7 @@
             app:contentScrim="?attr/colorPrimary"
             app:expandedTitleGravity="top|left"
             app:expandedTitleTextAppearance="@style/TextAppearance.AppCompat.Display2"
-            app:layout_scrollFlags="scroll"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:toolbarId="@+id/collapsing_toolbar">
 
             <androidx.appcompat.widget.Toolbar
@@ -114,6 +115,19 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom">
 
+        <TextView
+            android:id="@+id/recent_article"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="8dp"
+            android:textColor="@color/text_color"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="@id/play_recent_button"
+            app:layout_constraintTop_toTopOf="@id/play_recent_button"
+            app:layout_constraintStart_toStartOf="parent"
+            android:text="Article Name" />
+
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/add_pdf_button"
             android:layout_width="wrap_content"
@@ -157,11 +171,12 @@
             app:layout_constraintBottom_toBottomOf="parent"/>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_play_button"
+            android:id="@+id/play_recent_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            android:backgroundTint="@color/play_button_bgtint"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="@color/pure_black_or_white"
             android:clickable="true"
             android:contentDescription="@string/add_button"
             android:focusable="true"
